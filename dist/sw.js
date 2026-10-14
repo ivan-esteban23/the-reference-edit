@@ -1,5 +1,5 @@
 // Version the offline shell whenever index.html or its app assets change.
-const CACHE='visual-edit-shell-mobile-ui-20261014-v2';
+const CACHE='visual-edit-shell-mobile-ui-20261014-v3';
 const SHELL=['/index.html','/manifest.webmanifest','/favicon.svg','/icons/icon-192.png','/icons/icon-512.png','/icons/maskable-512.png','/icons/apple-touch-icon.png'];
 // Hosting may redirect /index.html to /. Store a fresh response so navigation can reuse it safely.
 self.addEventListener('install',event=>{event.waitUntil((async()=>{const cache=await caches.open(CACHE);await Promise.all(SHELL.map(async path=>{const response=await fetch(path,{cache:'reload'});if(!response.ok)throw new Error('Offline asset unavailable');await cache.put(path,new Response(response.body,{status:response.status,statusText:response.statusText,headers:response.headers}));}));await self.skipWaiting();})());});
@@ -13,11 +13,13 @@ self.addEventListener('fetch',event=>{
   try{
    const response=await fetch(request,{cache:'no-store',signal:controller.signal});
    if(!response.ok)throw new Error('Page unavailable');
+   // Keep the deadline active until the whole page arrives, not just its headers.
+   const body=await response.arrayBuffer();
    clearTimeout(timer);
-   // Remove redirect metadata before storing, as the host may redirect /index.html to /.
-   const copy=response.clone();
-   await cache.put('/index.html',new Response(copy.body,{status:copy.status,statusText:copy.statusText,headers:copy.headers}));
-   return response;
+   // Remove redirect metadata so the saved response can be used for navigation.
+   const page=new Response(body,{status:response.status,statusText:response.statusText,headers:response.headers});
+   await cache.put('/index.html',page.clone());
+   return page;
   }catch(error){return await cache.match('/index.html')||new Response('Reconnect to load The Reference Edit.',{status:503,headers:{'Content-Type':'text/plain'}});}
   finally{clearTimeout(timer);}
  })());return;}
