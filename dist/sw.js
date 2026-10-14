@@ -1,5 +1,5 @@
 // Version the offline shell whenever index.html or its app assets change.
-const CACHE='visual-edit-shell-newsreader-inter-20261014-v1';
+const CACHE='visual-edit-shell-reference-name-20261014-v1';
 const SHELL=['/index.html','/manifest.webmanifest','/favicon.svg','/icons/icon-192.png','/icons/icon-512.png','/icons/maskable-512.png','/icons/apple-touch-icon.png'];
 // Hosting may redirect /index.html to /. Store a fresh response so navigation can reuse it safely.
 self.addEventListener('install',event=>{event.waitUntil((async()=>{const cache=await caches.open(CACHE);await Promise.all(SHELL.map(async path=>{const response=await fetch(path,{cache:'reload'});if(!response.ok)throw new Error('Offline asset unavailable');await cache.put(path,new Response(response.body,{status:response.status,statusText:response.statusText,headers:response.headers}));}));await self.skipWaiting();})());});
@@ -18,7 +18,7 @@ self.addEventListener('fetch',event=>{
    const copy=response.clone();
    await cache.put('/index.html',new Response(copy.body,{status:copy.status,statusText:copy.statusText,headers:copy.headers}));
    return response;
-  }catch(error){return await cache.match('/index.html')||new Response('Reconnect to load The Visual Edit.',{status:503,headers:{'Content-Type':'text/plain'}});}
+  }catch(error){return await cache.match('/index.html')||new Response('Reconnect to load The Reference Edit.',{status:503,headers:{'Content-Type':'text/plain'}});}
   finally{clearTimeout(timer);}
  })());return;}
  if(SHELL.includes(url.pathname)){event.respondWith((async()=>{const cache=await caches.open(CACHE);return await cache.match(url.pathname)||fetch(request);})());}
