@@ -338,6 +338,9 @@ h1,h2,h3,h4,p,dt,dd,.footer-meta,.hero-actions a{overflow-wrap:anywhere}
 .source{container-type:inline-size}
 @container(max-width:12rem){.brand-row{flex-wrap:wrap}.brand-row h3{flex-basis:100%}.comparison{grid-template-columns:minmax(0,1fr)}.source-actions{grid-template-columns:minmax(0,1fr)}}
 .footer-main>*{min-width:0}.footer-nav{grid-template-columns:repeat(2,minmax(0,1fr))}.footer-nav a,.footer-wordmark{overflow-wrap:anywhere}
+/* Keep fixed controls from consuming the viewport when text is enlarged. */
+body{container-type:inline-size}
+@container(max-width:20rem){.mobile-nav{position:static;grid-template-columns:minmax(0,1fr);padding:var(--space-2)}.mobile-nav button{overflow-wrap:normal}.search-bar{position:static}.controls{grid-template-columns:minmax(0,1fr)}#search{width:100%;min-width:0}.controls #filter-toggle{width:100%}}
 /* Interaction tokens: quiet feedback without hiding content or moving controls. */
 :root{--motion-fast:140ms;--motion-ease:ease-out}
 button,select,summary,.hero-actions a,.jump a,.footer-nav a,#sections-menu a{transition:background-color var(--motion-fast) var(--motion-ease),border-color var(--motion-fast) var(--motion-ease),color var(--motion-fast) var(--motion-ease),box-shadow var(--motion-fast) var(--motion-ease)}
