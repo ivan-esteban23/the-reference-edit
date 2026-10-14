@@ -203,12 +203,11 @@ summary::-webkit-details-marker{display:none}
 .sections-heading button{min-height:var(--control-height);padding:8px 12px;border:1px solid var(--line);background:transparent;color:var(--link);font-size:var(--text-small)}
 #sections-menu nav{display:grid}
 #sections-menu :where(a,.app-entry){display:flex;align-items:center;min-height:48px;border-top:1px solid var(--line);font-size:14px;text-decoration:none}
-#copy-dialog,#app-dialog{width:min(90vw,520px);background:var(--surface);color:var(--ink);border:1px solid var(--line);padding:24px}
+#copy-dialog,#app-dialog{width:min(90vw,520px);max-height:85dvh;overflow:auto;background:var(--surface);color:var(--ink);border:1px solid var(--line);padding:24px;padding-bottom:max(24px,env(safe-area-inset-bottom))}
 #copy-dialog::backdrop,#app-dialog::backdrop{background:#0008}
 #copy-value{width:100%;min-width:0;padding:12px;border:1px solid var(--line);background:var(--page);font-size:16px;margin:10px 0}
 #copy-dialog button,#app-dialog button{background:var(--strong);color:var(--on-strong);border:0;min-height:var(--control-height);padding:10px 18px}
 .app-entry{min-height:var(--control-height);padding:0;text-align:left;border:0;background:transparent;font-size:var(--text-small)}
-#app-dialog{max-height:85dvh;overflow:auto;padding-bottom:max(24px,env(safe-area-inset-bottom))}
 .app-heading{display:flex;align-items:start;justify-content:space-between;gap:18px}.app-heading h2{margin-top:0}.app-actions{display:flex;flex-wrap:wrap;gap:12px;margin:18px 0}.app-status{border-top:1px solid var(--line);padding-top:16px;color:var(--muted);font-size:var(--text-small)}
 html:lang(zh-Hans) h1,html:lang(zh-Hant) h1,html:lang(ja) h1,html:lang(ko) h1{font-family:'Noto Serif CJK SC','Noto Serif CJK TC','Noto Serif JP','Noto Serif KR','Songti SC','Yu Mincho','Batang',serif;font-size:clamp(38px,5vw,64px);line-height:1.2;letter-spacing:0}
 html:lang(zh-Hans) h2,html:lang(zh-Hant) h2,html:lang(ja) h2,html:lang(ko) h2,html:lang(zh-Hans) .cover-line,html:lang(zh-Hant) .cover-line,html:lang(ja) .cover-line,html:lang(ko) .cover-line{font-family:'Noto Serif CJK SC','Noto Serif CJK TC','Noto Serif JP','Noto Serif KR','Songti SC','Yu Mincho','Batang',serif;line-height:1.4}
