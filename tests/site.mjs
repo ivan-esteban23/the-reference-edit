@@ -41,6 +41,27 @@ for (const match of html.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script>/gi)) {
   new vm.Script(match[2]); scripts++;
 }
 const result = {sourceRecords: 58, recordsByteIdenticalExceptImageURLs: true, imagesByteIdentical: embedded.length, fontsByteIdentical: embeddedFonts.length, scriptsCompiled: scripts, layouts: [], checks: []};
+{
+  const marker = 'translations={', start = html.indexOf(marker);
+  assert.ok(start > 0, 'Translations object missing');
+  let depth = 0, end = start + 'translations='.length, inString = false, quote = '', escaped = false;
+  for (; end < html.length; end++) {
+    const character = html[end];
+    if (inString) {if (escaped) {escaped = false; continue;} if (character === '\\') {escaped = true; continue;} if (character === quote) inString = false; continue;}
+    if (character === '"' || character === "'") {inString = true; quote = character; continue;}
+    if (character === '{') depth++; else if (character === '}' && --depth === 0) {end++; break;}
+  }
+  const translations = JSON.parse(html.slice(start + 'translations='.length, end));
+  const outside = html.slice(0, start) + html.slice(end);
+  const locales = Object.keys(translations), base = new Set(Object.keys(translations[locales[0]]));
+  for (const locale of locales) {
+    const keys = Object.keys(translations[locale]);
+    assert.deepEqual(keys.filter(key => !base.has(key)), [], `${locale} has extra translation keys`);
+    assert.deepEqual([...base].filter(key => !keys.includes(key)), [], `${locale} is missing translation keys`);
+  }
+  const stale = [...base].filter(key => !outside.includes(key) && !outside.includes(key.replace(/&/g, '&amp;')));
+  assert.deepEqual(stale, [], 'Stale translation keys: ' + stale.slice(0, 5).join(' | '));
+}
 const page = await browser((req, res) => serve(files, req, res));
 const {evaluate: ev, call, navigate} = page;
 const check = name => {result.checks.push(name); console.log(name);};

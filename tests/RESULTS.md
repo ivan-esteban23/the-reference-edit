@@ -1,3 +1,13 @@
+# Content cleanup — 15 October 2026
+
+Reviewed the curated catalog for the cleanup goal and found nothing to remove: no host repeats, all 58 source URLs still respond to live requests, all 58 purpose descriptions are unique, every one of the 59 cover/source images is still referenced and review dates are current. The 58 records therefore remain byte-identical to the original fixture under the standing source-preservation check; the four records whose “Official context” anchor duplicates their country-evidence URL (Booooooom, Colossal, Rijksmuseum, Met) and evidence links that repeat the source URL were left as delivered rather than editing preserved records.
+
+Removed 77 stale translation keys from the five non-English dictionaries (`es`, `zh-Hans`, `zh-Hant`, `ja`, `ko`): leftovers from removed sections and historical date/audit copy. The inline dictionary shrank from 216,303 to 179,986 characters (page: 563,580 → 527,263) while every locale keeps the same 460 keys. The offline shell version is now `visual-edit-shell-content-cleanup-v1`.
+
+Extended `tests/site.mjs`: it parses the inline translations object before any browser work, requires identical key sets in all five dictionaries (both directions) and fails if any dictionary key no longer appears anywhere else on the page, so removed sections cannot leave stale translations behind.
+
+Passed the full suite: `site.mjs` (96 layouts and twelve groups plus the new dictionary checks), `chooser.mjs`, `collection.mjs`, `recently-viewed.mjs`, `personal-sources.mjs`, `personal-backup.mjs`, `collection-backup.mjs`, `collection-folders.mjs`, `source-notes.mjs`, `service-worker.mjs`, `worker-storage.mjs` (10/10) and `pages.mjs`. Verified all 58 source records, 59 cover/source images and both fonts retain their original content; external providers were never visited. `git diff --check` passed. Validation uses Chromium; physical phones and other browser engines were not tested.
+
 # Collection folders — 15 October 2026
 
 Added named folders to My collection so saved directory cards and personal sources can be grouped, viewed and filtered. A translated folder section creates, renames and deletes folders in a dialog with focus restoration, a 60-character plain-text limit and case-insensitive duplicate rejection; deleting a folder never deletes or unfavorites a source. Each card gains a folder select with live counts, and the folder filter narrows both kinds and combines with the shared search and kind choices. Folders use a new `reference-edit-collection-folders-v1` key; favorites, notes and personal records keep their existing formats. Corrupt storage hides the section with a warning until repaired, and failed writes keep the previous list.
