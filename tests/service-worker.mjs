@@ -11,7 +11,8 @@ for (const [map, revision] of [[oldFiles, 'old'], [files, 'new']]) {
 const cacheName = map => map.get('/sw.js').toString().match(/const CACHE='([^']+)'/)[1];
 const oldCache = cacheName(oldFiles), newCache = cacheName(files);
 const newShell = vm.runInNewContext(files.get('/sw.js').toString().match(/const SHELL=(\[[^;]+\]);/)[1]);
-const imagePaths = [...files.keys()].filter(path=>path.startsWith('/images/'));
+// Only content-addressed page images use this worker's on-demand caching route.
+const imagePaths = [...files.keys()].filter(path=>/^\/images\/image-[a-f0-9]{16}\.(?:png|jpg|gif|ico|svg)$/.test(path));
 const logoPath = imagePaths.find(path=>!newShell.includes(path));
 assert.notEqual(oldCache, newCache, 'Migration fixture must have an older shell version');
 new vm.Script(files.get('/sw.js').toString());

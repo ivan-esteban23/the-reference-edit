@@ -24,7 +24,32 @@ for (let i = 0; i < embedded.length; i++) {
   assert.deepEqual(files.get('/' + url), original, `Image bytes changed: ${url}`);
   restored = restored.replace(url, embedded[i][0]);
 }
-assert.equal(files.size - [...files.keys()].filter(key=>!key.startsWith('/images/')).length, new Set(extracted.map(m=>m[0])).size, 'Unreferenced extracted images');
+// assets() walks every dist file, including documentation and folder markers.
+const imageAssets = [...files.keys()].filter(key=>key.startsWith('/images/')&&/\.(?:avif|bmp|gif|ico|jpe?g|png|svg|webp)$/i.test(key));
+const editorialPrefix = '/images/references/';
+assert.deepEqual(imageAssets.filter(key=>!key.startsWith(editorialPrefix)).sort(),
+  [...new Set(extracted.map(m=>'/' + m[0]))].sort(), 'Missing or unreferenced curated image assets');
+
+// Gallery assets are catalogued independently; they are not embedded in the current UI.
+const references = JSON.parse(files.get('/data/references.json').toString()).references;
+assert.ok(Array.isArray(references), 'Editorial references must be an array');
+const referenceIds = references.map(entry=>entry.id);
+assert.ok(referenceIds.every(id=>typeof id==='string'&&id.trim()), 'Editorial IDs must be nonempty strings');
+assert.equal(new Set(referenceIds).size, referenceIds.length, 'Duplicate editorial reference IDs');
+const availableReferences = references.filter(entry=>entry.assetStatus==='available');
+for (const entry of references) {
+  if(entry.imageType==='ai-generated') {
+    assert.equal(entry.source, 'Created with ChatGPT', `Missing AI attribution: ${entry.id}`);
+    assert.equal(entry.disclosure, 'AI-generated editorial illustration · Created with ChatGPT · Not documentary photography', `Missing AI disclosure: ${entry.id}`);
+  }
+}
+for (const entry of availableReferences) {
+  assert.ok(typeof entry.image==='string'&&entry.image.startsWith(editorialPrefix)&&imageAssets.includes(entry.image), `Missing local editorial image: ${entry.id}`);
+  assert.ok(files.get(entry.image).length>0, `Empty editorial image: ${entry.id}`);
+  if(/\.jpe?g$/i.test(entry.image))assert.deepEqual(files.get(entry.image).subarray(0,3),Buffer.from([0xff,0xd8,0xff]), `Editorial JPEG has the wrong format: ${entry.id}`);
+}
+assert.deepEqual(imageAssets.filter(key=>key.startsWith(editorialPrefix)).sort(),
+  [...new Set(availableReferences.map(entry=>entry.image))].sort(), 'Uncatalogued editorial image assets');
 assert.equal(records(html).length, 58); assert.deepEqual(records(restored), records(before), 'Source records changed beyond image URLs');
 const embeddedFonts = [...before.matchAll(/data:font\/ttf;base64,([A-Za-z0-9+/=]+)/g)];
 const fontPaths = [...html.matchAll(/fonts\/font-[a-f0-9]{16}\.ttf/g)].map(m=>m[0]);
@@ -78,6 +103,14 @@ try {
   await navigate();
   assert.ok(await ev("Promise.all([...document.images].map(i=>i.decode())).then(()=>[...document.images].every(i=>i.naturalWidth>0))"), 'Extracted images did not render');
   check('All 59 cover/source images retain their bytes and all page images decode');
+  result.editorialImages=[];
+  for(const entry of availableReferences){
+    const dimensions=await ev(`(async()=>{const image=new Image();image.src=${JSON.stringify(entry.image)};await image.decode();return {width:image.naturalWidth,height:image.naturalHeight};})()`);
+    assert.ok(dimensions.width>0&&dimensions.height>0, `Editorial image did not decode: ${entry.id}`);
+    result.editorialImages.push({id:entry.id,...dimensions});
+  }
+  check(`${availableReferences.length} available editorial images have unique catalog IDs, valid local assets and successful browser decoding`);
+
   assert.ok(await ev("document.fonts.size===2&&[...document.fonts].every(f=>f.status==='loaded')"), 'External fonts failed to load');
   check('Both extracted fonts retain their original bytes and load successfully');
   await call('Emulation.setDeviceMetricsOverride',{width:390,height:844,deviceScaleFactor:1,mobile:false});

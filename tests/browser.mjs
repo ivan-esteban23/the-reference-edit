@@ -33,11 +33,15 @@ export async function browser(handler) {
   await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
   const origin = `http://127.0.0.1:${server.address().port}`;
   const profile = await mkdtemp(path.join(tmpdir(), 'reference-regression-'));
-  const chrome = spawn(process.env.CHROMIUM || '/usr/bin/chromium', [
+  const executable = process.env.CHROMIUM || '/usr/bin/chromium';
+  const chrome = spawn(executable, [
     '--headless', '--no-sandbox', '--disable-dev-shm-usage', '--disable-gpu',
     '--no-first-run', '--no-default-browser-check', '--remote-debugging-port=0',
     '--user-data-dir=' + profile, 'about:blank',
-  ], {stdio: 'ignore'});
+  ], {stdio: ['ignore', 'ignore', 'pipe']});
+  let startupError, startupLog = '';
+  chrome.on('error', error => {startupError = error;});
+  chrome.stderr.on('data', chunk => {startupLog = (startupLog + chunk.toString()).slice(-8000);});
   let ws, sequence = 0;
   const pending = new Map(), exceptions = [], navigations = [];
   async function close() {
@@ -53,11 +57,14 @@ export async function browser(handler) {
   }
   try {
     let port;
-    for (let i = 0; i < 200; i++) {
-      try {port = (await readFile(path.join(profile, 'DevToolsActivePort'), 'utf8')).split('\n')[0]; break;}
-      catch {await pause(50);}
+    // Allow a bounded 30 seconds for a cold runner; fail immediately if launch failed.
+    for (let i = 0; i < 600; i++) {
+      if (startupError || chrome.exitCode !== null || chrome.signalCode !== null) break;
+      try {port = (await readFile(path.join(profile, 'DevToolsActivePort'), 'utf8')).split('\n')[0]; if (/^\d+$/.test(port)) break;}
+      catch (error) {if (error.code !== 'ENOENT') throw error;}
+      await pause(50);
     }
-    assert.ok(port, 'Chromium did not start (set CHROMIUM to its executable)');
+    assert.ok(port && /^\d+$/.test(port), `Chromium did not start (${executable}; ${startupError?.message || chrome.signalCode || (chrome.exitCode !== null ? 'exit '+chrome.exitCode : '30s startup timeout')})\n${startupLog}`);
     const tabs = await (await fetch(`http://127.0.0.1:${port}/json/list`)).json();
     ws = new WebSocket(tabs.find(tab => tab.type === 'page').webSocketDebuggerUrl);
     await new Promise((resolve, reject) => {ws.addEventListener('open', resolve, {once: true}); ws.addEventListener('error', reject, {once: true});});
