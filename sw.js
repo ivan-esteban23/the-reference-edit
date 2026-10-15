@@ -1,5 +1,5 @@
 // Version the offline shell whenever index.html or its app assets change.
-const CACHE='reference-edit-pages-shell-2fe51e6b7dfdf88831decd2715f350b828c58d16';
+const CACHE='reference-edit-pages-shell-82fa379a76ff26f3a3762951c3a9f62db3cfc011';
 // Only the cover and favicon are needed for the first offline paint. Source logos cache on demand.
 const SHELL=['/the-reference-edit/index.html','/the-reference-edit/manifest.webmanifest','/the-reference-edit/favicon.svg','/the-reference-edit/icons/icon-192.png','/the-reference-edit/icons/icon-512.png','/the-reference-edit/icons/maskable-512.png','/the-reference-edit/icons/apple-touch-icon.png','/the-reference-edit/images/image-85cfa79ee7373f6f.svg','/the-reference-edit/images/image-d75e09331c4509f9.jpg','/the-reference-edit/fonts/font-8a08d13f8a6c0d51.ttf','/the-reference-edit/fonts/font-29160a80ff49ddca.ttf'];
 // Hosting may redirect /index.html to /. Store a fresh response so navigation can reuse it safely.
