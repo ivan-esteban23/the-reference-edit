@@ -9,6 +9,7 @@ From the repository root:
 ```sh
 node tests/service-worker.mjs
 node tests/site.mjs
+node tests/chooser.mjs
 node --test tests/worker-storage.mjs
 node tests/collection.mjs
 node tests/personal-sources.mjs
@@ -74,3 +75,7 @@ Use current macOS Safari and an iPhone/iPad Safari installation over HTTPS. Reco
 `collection-backup.mjs` verifies real complete and directory-only downloads, fresh-device restoration of both stores, mixed duplicates and missing catalog URLs, existing metadata/favorite preservation, malformed/unsafe files, corrupt destination data, latest-storage rechecks, failures in either write, rollback failure/retry, and complete offline export/restore. It also checks 96 populated-preview viewport/text-size/theme/language cases. Captures go to `/tmp/reference-complete-backup-results/`.
 
 Research guides consolidate reading, project routes, workflow and the reference record into `#routes`. Three native disclosures cover inspiration, topic research and moodboards; `#notes` retains one shared record template. Historic `#workflow` and `#landscape` fragments open their matching guides, and native keyboard controls/print expansion are covered by the site suite. The 96-case layout matrix includes expanded guide headings and body copy. Pages checks also open the moodboard guide offline from the collection view.
+
+“Help me choose” is a collapsed disclosure in the directory introduction, also linked from each research guide. Four fixed goals each map to three existing catalog URLs. Suggestions reuse translated source purposes and access notes; PureRef uses its existing editorial-selection description. They are editorial recommendations, not personalized rankings. Goal choices remain in page memory; favorites use the existing storage/collection/backup path. “View in directory” clears filters, opens the full record and focuses its link. Provider websites still require internet.
+
+`chooser.mjs` checks all four recommendation sets, exact catalog preservation before saving, save/remove/persistence and collection counts, quota-failure warnings, focus, independent filters, full-record navigation, guide links, translation and 96 expanded chooser layouts. It also disconnects the server for offline recommendation/saving/navigation checks. Current mobile evidence is `/tmp/reference-chooser-results/mobile.png`. Pages tests also open and use the chooser offline under the project prefix.
