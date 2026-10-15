@@ -78,7 +78,7 @@ try {
       const errors=[],describe=e=>e.id||e.className||e.tagName;
       const overlap=(a,b)=>a.left<b.right-1&&b.left<a.right-1&&a.top<b.bottom-1&&b.top<a.bottom-1;
       if(document.documentElement.scrollWidth>innerWidth+1)errors.push('document overflow');
-      const selectors='.masthead>span,.masthead button,.language-switch,.controls input,.controls button,.source h3,.source-purpose,.source-actions button,.source-details summary,.filter-field label,.footer-nav a';
+      const selectors='.hero h1,.cover-image figcaption,.hero-actions a,.masthead>span,.masthead button,.language-switch,.controls input,.controls button,.source h3,.source-purpose,.source-actions button,.source-details summary,.filter-field label,.footer-nav a';
       for(const e of document.querySelectorAll(selectors)){
         if(!visible(e))continue;const r=e.getBoundingClientRect();
         if(r.left < -1 || r.right>innerWidth+1)errors.push('outside viewport: '+describe(e));
@@ -90,7 +90,7 @@ try {
           if([...range.getClientRects()].some(t=>t.left<r.left-2||t.right>r.right+2))errors.push('text outside control: '+describe(e));
         }
       }
-      for(const selectors of [['.theme-toggle','.language-switch'],['.masthead>span','.masthead-actions'],['#search','#filter-toggle']]){
+      for(const selectors of [['.hero h1','.cover-image'],['.theme-toggle','.language-switch'],['.masthead>span','.masthead-actions'],['#search','#filter-toggle']]){
         const [a,b]=selectors.map(s=>document.querySelector(s));if(visible(a)&&visible(b)&&overlap(a.getBoundingClientRect(),b.getBoundingClientRect()))errors.push('overlap: '+selectors.join('/'));
       }
       const bar=document.querySelector('.search-bar');

@@ -1,3 +1,9 @@
+# Mobile editorial cover validation
+
+Replaced the small mobile thumbnail with a full-proportion portrait beside the headline. The introduction, directory actions and research labels follow below; the image credit stays directly below the portrait. At 390×844 the portrait is about 149×189px (previously 88×112px), with search at 875px and the first curated card at 1,423px. Enlarged text switches to a stacked cover when there is insufficient room for two columns; mobile action labels wrap. Desktop layout and all 58 curated records remain unchanged.
+
+The existing 96-case Chromium layout matrix now checks heading/credit/action text bounds and heading/image overlap. It caught and verified the fix for action-label overflow at 320px with 200% text. The site suite passed all eleven check groups, and Pages preparation passed its four groups including offline navigation, preferences and assets. Mobile, narrow-screen, enlarged-text and desktop captures were visually inspected; the manifest mobile capture was refreshed. The worker key is `visual-edit-shell-editorial-cover-v1`. Physical-phone/Safari testing and publication are pending merge.
+
 # Automatic publishing and compact mobile layout validation
 
 Added `.github/workflows/pages.yml`: all regression suites run on PRs and main pushes, while publication is restricted to successful runs on `main`. A standalone Node script prepares project-prefixed Pages snapshots outside the checkout and preserves all source records/binary assets. The publishing job updates the existing Pages source branch without rewriting history, then explicitly requests a Pages build using the workflow's contents/pages permissions. `DEPLOYMENT.md` documents operation and first-run verification. Live Actions publication still requires its first successful main run; local checks do not establish workflow-token permission readiness.
