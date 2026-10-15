@@ -6,6 +6,7 @@ import vm from 'node:vm';
 
 const source=await readFile(new URL('../dist/sw.js',import.meta.url),'utf8');
 const origin='https://reference.example';
+const shellIcon=JSON.parse(await readFile(new URL('../dist/manifest.webmanifest',import.meta.url),'utf8')).icons.find(icon=>icon.sizes==='192x192').src;
 const failure=()=>Promise.reject(new DOMException('Storage unavailable','QuotaExceededError'));
 function worker({openFailure=false,readFailure=false,writeFailure=false,cleanupFailure=false,offline=false,opaque=false}={}) {
   const handlers={},state={writes:0,claimed:false,skipped:false,messages:[],fetches:0};
@@ -37,12 +38,12 @@ test('a navigation returns fresh HTML when a cache write fails',async()=>{
 });
 test('unavailable storage still permits online navigation and shell assets',async()=>{
   const w=worker({openFailure:true});
-  for(const [path,mode] of [['/','navigate'],['/icons/icon-192.png','no-cors'],['/images/image-0123456789abcdef.png','no-cors']])
+  for(const [path,mode] of [['/','navigate'],[shellIcon,'no-cors'],['/images/image-0123456789abcdef.png','no-cors']])
     assert.equal(await (await w.request(path,mode)).text(),'fresh response');
 });
 test('unreadable cache entries fall back to online assets',async()=>{
   const w=worker({readFailure:true});
-  for(const path of ['/icons/icon-192.png','/images/image-0123456789abcdef.png'])
+  for(const path of [shellIcon,'/images/image-0123456789abcdef.png'])
     assert.equal(await (await w.request(path,'no-cors')).text(),'fresh response');
 });
 test('offline navigation keeps its cached fallback',async()=>{
