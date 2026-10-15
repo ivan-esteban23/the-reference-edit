@@ -1,0 +1,76 @@
+name: Test and publish website
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: website-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  test:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '24'
+      - name: Locate Chromium
+        run: |
+          chrome_binary=$(command -v google-chrome)
+          echo "CHROMIUM=$chrome_binary" >> "$GITHUB_ENV"
+      - run: node tests/site.mjs
+      - run: node tests/personal-sources.mjs
+      - run: node tests/personal-backup.mjs
+      - run: node tests/service-worker.mjs
+      - run: node --test tests/worker-storage.mjs
+      - run: node tests/pages.mjs
+      - uses: actions/upload-artifact@v6
+        if: always()
+        with:
+          name: website-test-results
+          path: /tmp/reference-regression-results/
+
+  publish:
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    needs: test
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: write
+      pages: write
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '24'
+      - name: Prepare GitHub Pages files
+        run: node scripts/prepare-pages.mjs "$RUNNER_TEMP/reference-pages" /the-reference-edit/ "$GITHUB_SHA"
+      - name: Publish the Pages source branch
+        env:
+          GIT_INDEX_FILE: ${{ runner.temp }}/pages.index
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git fetch origin refs/heads/preview/phone:refs/remotes/origin/preview/phone
+          git read-tree --empty
+          git --work-tree="$RUNNER_TEMP/reference-pages" add --all
+          pages_tree=$(git write-tree)
+          pages_parent=$(git rev-parse refs/remotes/origin/preview/phone)
+          pages_commit=$(git commit-tree "$pages_tree" -p "$pages_parent" -m "Publish website from $GITHUB_SHA")
+          git push origin "$pages_commit:refs/heads/preview/phone"
+      - name: Request a Pages build
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh api --method POST "repos/$GITHUB_REPOSITORY/pages/builds" --jq '.status'

@@ -1,3 +1,13 @@
+# Automatic publishing and compact mobile layout validation
+
+Added `.github/workflows/pages.yml`: all regression suites run on PRs and main pushes, while publication is restricted to successful runs on `main`. A standalone Node script prepares project-prefixed Pages snapshots outside the checkout and preserves all source records/binary assets. The publishing job updates the existing Pages source branch without rewriting history, then explicitly requests a Pages build using the workflow's contents/pages permissions. `DEPLOYMENT.md` documents operation and first-run verification. Live Actions publication still requires its first successful main run; local checks do not establish workflow-token permission readiness.
+
+The mobile hero retains the original typography, portrait and credit with a shorter translated introduction and compact portrait. Export/sharing tools and access definitions use disclosures. Empty personal collections hide introductory/empty-state prose on mobile while keeping Add source and Backup/restore available; populated collections retain their content. The new source worker key is `visual-edit-shell-mobile-layout-v1`. Refreshed mobile/desktop install captures reflect the current layout.
+
+At 390×844 with normal text, measured search position decreased from about 1,562px to 878px, the first card from 2,504px to 1,425px, and the hero height from 1,106px to 528px. Home/directory captures were visually inspected. All 58 curated records are unchanged.
+
+Passed locally: site (96 layouts, eleven check groups), personal sources (96 layouts, ten groups), backup/import (96 layouts, eight groups), worker migration/navigation (twelve groups), injected worker-storage failures (ten tests), and Pages preparation (four groups covering project paths, cache cleanup, assets, installability, persistence and offline navigation). Workflow YAML parsed successfully and `git diff --check` passed. Safari/Firefox and physical-device testing of the new layout are outstanding. The current phone site remains unchanged until publication after merge.
+
 # Personal source backup and restore validation
 
 Added a compact “Backup and restore” disclosure in My sources. JSON export includes all personal records, metadata, image URLs and favorites, regardless of search/favorites filters. Import validates versioned backups up to 5 MB, previews counts and requires confirmation. It adds new canonical URLs while preserving existing records and favorites, skips duplicates and assigns fresh IDs. Confirmation rereads current storage to preserve other-tab changes. Invalid data is rejected before writes; failed writes preserve the collection and selected file for retry. All controls/messages support the six existing languages.

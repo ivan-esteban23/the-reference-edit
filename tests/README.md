@@ -2,6 +2,8 @@
 
 The maintained site is the buildless `dist/` directory. No installation or build step is required. These tests use Node's built-in APIs and a local Chromium executable; they create isolated temporary browser profiles and remove them afterward.
 
+[Deployment instructions](../DEPLOYMENT.md) describe the GitHub workflow and Pages snapshot preparation. PRs run tests without publishing; successful test runs on `main` prepare the hosted paths, update the Pages source branch and request a Pages build.
+
 From the repository root:
 
 ```sh
@@ -10,6 +12,7 @@ node tests/site.mjs
 node --test tests/worker-storage.mjs
 node tests/personal-sources.mjs
 node tests/personal-backup.mjs
+node tests/pages.mjs
 ```
 
 For a focused interaction/keyboard rerun, use `node tests/site.mjs --interactions-only`; that mode explicitly omits the layout matrix.
@@ -31,6 +34,10 @@ Images live in content-addressed files under `dist/images/`; keep their names in
 Fonts live in content-addressed `dist/fonts/` files and are required offline-shell assets. Keep each filename in sync with its SHA-256 prefix and update the worker shell list/version when replacing a font. Font licenses remain in the HTML. UI checks verify both font binaries against the historical fixture and require loaded fonts; worker checks require loaded fonts during navigation fallback. See [the focused audit](AUDIT.md) for current size measurements, install naming and follow-ups.
 
 The source-record check permits only image URL substitutions against the historical fixture: it verifies all 60 extracted images byte-for-byte, restores the original data URLs, and then compares all 58 article records exactly. Browser checks also decode every page image. Worker checks exercise the cover on the first offline reload, logo caching, failed image downloads and retry, and image decoding during offline and slow/error navigation fallback.
+
+Before expanding disclosures for the 96-case layout matrix, the site suite checks the default 390px mobile entry: search must start before 1,000px and the first source before 1,550px. It also verifies collection tools can be expanded and their actions remain visible. These bounds target the previous excessively long entry without constraining enlarged-text layouts. All 58 records remain in the directory.
+
+`pages.mjs` runs the actual publication preparer into a fresh temporary directory, verifies source/binary preservation and tests the project-prefix URLs in Chromium. It checks old-preview cache cleanup without deleting unrelated caches, manifest and worker scope, icons/screenshots, fonts/images, installability, saved preferences and offline navigation. It does not publish or simulate GitHub Actions permissions.
 
 `worker-storage.mjs` runs the actual worker in Node's VM with injected Cache API failures and native Fetch response objects. Its ten tests cover quota errors, unavailable/unreadable storage, useful offline fallback, opaque image rejection from caching, strict installation, activation cleanup failure and offline-status replies. These are deterministic failure tests, not Safari or real quota simulations. Runtime storage failures must allow successful online responses through; installation still requires all shell writes to succeed. The four-second navigation deadline stays active through the full HTML body, and navigation responses are reconstructed to remove redirect metadata.
 
