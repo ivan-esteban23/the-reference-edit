@@ -54,6 +54,18 @@ try {
   check('All 60 extracted images retain their bytes and all page images decode');
   assert.ok(await ev("document.fonts.size===2&&[...document.fonts].every(f=>f.status==='loaded')"), 'External fonts failed to load');
   check('Both extracted fonts retain their original bytes and load successfully');
+  await call('Emulation.setDeviceMetricsOverride',{width:390,height:844,deviceScaleFactor:1,mobile:false});
+  await pause(50);
+  result.mobileEntry=await ev("({searchTop:document.querySelector('.search-bar').getBoundingClientRect().top,firstCardTop:document.querySelector('.source').getBoundingClientRect().top,toolsClosed:!document.querySelector('#collection-tools').open,emptyIntroHidden:getComputedStyle(document.querySelector('#my-sources>.personal-note')).display==='none'})");
+  assert.ok(result.mobileEntry.searchTop<1000&&result.mobileEntry.firstCardTop<1550,'Mobile entry became too long: '+JSON.stringify(result.mobileEntry));
+  assert.ok(result.mobileEntry.toolsClosed&&result.mobileEntry.emptyIntroHidden);
+  await ev("document.querySelector('#collection-tools').open=true");
+  assert.ok(await ev("['#export-favorites','#share-view'].every(s=>document.querySelector(s).getClientRects().length>0)"),'Collection tools inaccessible when expanded');
+  await ev("document.querySelector('#collection-tools').open=false");
+  await ev('storageAvailable=false;refreshFavorites()');
+  assert.ok(await ev("document.querySelector('#storage-warning').getClientRects().length>0"),'Storage warning hidden inside collapsed tools');
+  await ev('storageAvailable=true;refreshFavorites()');
+  check('Compact mobile entry reaches search/cards sooner and keeps collection tools accessible');
   // Exercise disclosures while measuring; a collapsed page can hide overflow bugs.
   await ev("document.querySelectorAll('details').forEach(d=>d.open=true)");
   const widths=process.argv.includes('--interactions-only')?[]:[320,390,768,1440];
