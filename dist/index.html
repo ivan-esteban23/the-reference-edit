@@ -856,7 +856,7 @@ document.querySelector('#export-favorites').addEventListener('click',()=>{if(!fa
 
   $('personal-tools').hidden=!total;$('personal-only').setAttribute('aria-pressed',String(only));
   $('personal-status').textContent=total?`${directory.length+visible.length} / ${total} ${label('shown')}`:label('empty');
-  $('personal-export').disabled=!sources.length;$('collection-export-directory').disabled=!selected.length;
+  $('personal-export').disabled=!total;$('collection-export-directory').disabled=!selected.length;
   list.replaceChildren();
   if(total&&!visible.length&&!directory.length)list.append(element('p',label('noMatches')));
   for(const original of directory){
@@ -948,11 +948,12 @@ document.querySelector('#export-favorites').addEventListener('click',()=>{if(!fa
  const backupNames=['backup','export','import','file','backupHint','preview','imported','invalidBackup'];
  for(const locale of Object.keys(words))words[locale].push(...backupWords[locale]);names.push(...backupNames);
 
- const exportLabels={"en": ["Export and restore", "Export added sources (.json)", "Import added sources", "JSON backs up only sources you add, including their favorites. Directory favorites use the separate Markdown export. Imports add new URLs and keep existing sources unchanged.", "Export directory favorites (.md)"], "es": ["Exportar y restaurar", "Exportar fuentes añadidas (.json)", "Importar fuentes añadidas", "JSON copia solo las fuentes que añades, incluidas sus favoritas. Las favoritas del directorio se exportan por separado en Markdown. Importar añade URL nuevas y conserva las fuentes existentes.", "Exportar favoritas del directorio (.md)"], "zh-Hans": ["导出与恢复", "导出添加的来源 (.json)", "导入添加的来源", "JSON 仅备份你添加的来源及其收藏状态。目录收藏使用单独的 Markdown 导出。导入仅添加新网址，保留现有来源。", "导出目录收藏 (.md)"], "zh-Hant": ["匯出與還原", "匯出新增的來源 (.json)", "匯入新增的來源", "JSON 僅備份你新增的來源及其收藏狀態。目錄收藏使用獨立的 Markdown 匯出。匯入僅新增網址，保留現有來源。", "匯出目錄收藏 (.md)"], "ja": ["書き出しと復元", "追加した情報源を書き出す (.json)", "追加した情報源を読み込む", "JSONには自分で追加した情報源とそのお気に入りを保存します。ディレクトリのお気に入りは別のMarkdownで書き出します。読み込み時は新しいURLのみ追加し、既存の情報源は変更しません。", "ディレクトリのお気に入りを書き出す (.md)"], "ko": ["내보내기 및 복원", "추가한 소스 내보내기 (.json)", "추가한 소스 가져오기", "JSON은 직접 추가한 소스와 해당 즐겨찾기만 백업합니다. 디렉터리 즐겨찾기는 별도의 Markdown으로 내보냅니다. 가져오기는 새 URL만 추가하며 기존 소스는 유지합니다.", "디렉터리 즐겨찾기 내보내기 (.md)"]};
- for(const locale of Object.keys(words)){for(const [i,name] of ['backup','export','import','backupHint'].entries())words[locale][names.indexOf(name)]=exportLabels[locale][i];words[locale].push(exportLabels[locale][4]);}names.push('exportDirectory');
+ const exportLabels={"en": ["Backup and restore", "Export collection (.json)", "Import collection", "Back up directory favorites and all added sources in one JSON file. Import adds missing items and keeps existing records unchanged. Older added-source backups are also accepted.", "Export directory favorites (.md)", "Choose a collection or older added-source JSON backup (version 1, up to 5 MB). Nothing was imported.", "{directoryAdded} directory favorites and {added} added sources to add; {skipped} duplicates skipped; {unavailable} directory URLs unavailable.", "Imported {directoryAdded} directory favorites and {added} added sources; skipped {skipped} duplicates and {unavailable} unavailable directory URLs.", "Import is incomplete. Your existing records are safe. Check browser storage and retry to finish."], "es": ["Copia y restauración", "Exportar colección (.json)", "Importar colección", "Copia las favoritas del directorio y todas las fuentes añadidas en un JSON. Importar añade elementos nuevos y conserva los registros existentes. También acepta copias anteriores de fuentes añadidas.", "Exportar favoritas del directorio (.md)", "Elige una copia JSON de la colección o una copia anterior de fuentes añadidas (versión 1, hasta 5 MB). No se importó nada.", "Se añadirán {directoryAdded} favoritas del directorio y {added} fuentes; se omiten {skipped} duplicados y {unavailable} URL no disponibles.", "Se importaron {directoryAdded} favoritas del directorio y {added} fuentes; se omitieron {skipped} duplicados y {unavailable} URL no disponibles.", "La importación está incompleta. Tus registros existentes están a salvo. Comprueba el almacenamiento y reintenta para terminar."], "zh-Hans": ["备份与恢复", "导出收藏集 (.json)", "导入收藏集", "将目录收藏和所有添加的来源备份到一个 JSON 文件。导入仅添加缺少的项目，保留现有记录。也支持旧版个人来源备份。", "导出目录收藏 (.md)", "请选择收藏集或旧版个人来源 JSON 备份（版本 1，最大 5 MB）。未导入任何内容。", "将添加 {directoryAdded} 个目录收藏和 {added} 个个人来源；跳过 {skipped} 个重复项目和 {unavailable} 个不可用目录网址。", "已导入 {directoryAdded} 个目录收藏和 {added} 个个人来源；跳过 {skipped} 个重复项目和 {unavailable} 个不可用目录网址。", "导入尚未完成。现有记录是安全的。请检查浏览器存储后重试以完成导入。"], "zh-Hant": ["備份與還原", "匯出收藏集 (.json)", "匯入收藏集", "將目錄收藏與所有新增的來源備份到一個 JSON 檔案。匯入僅新增缺少的項目，保留現有紀錄。也支援舊版個人來源備份。", "匯出目錄收藏 (.md)", "請選擇收藏集或舊版個人來源 JSON 備份（版本 1，最大 5 MB）。未匯入任何內容。", "將新增 {directoryAdded} 個目錄收藏與 {added} 個個人來源；略過 {skipped} 個重複項目與 {unavailable} 個無法使用的目錄網址。", "已匯入 {directoryAdded} 個目錄收藏與 {added} 個個人來源；略過 {skipped} 個重複項目與 {unavailable} 個無法使用的目錄網址。", "匯入尚未完成。現有紀錄是安全的。請檢查瀏覽器儲存空間後重試以完成匯入。"], "ja": ["バックアップと復元", "コレクションを書き出す (.json)", "コレクションを読み込む", "ディレクトリのお気に入りと追加したすべての情報源を1つのJSONに保存します。読み込みは不足項目のみ追加し、既存の情報は変更しません。以前の情報源バックアップにも対応しています。", "ディレクトリのお気に入りを書き出す (.md)", "コレクションまたは以前の情報源のJSONバックアップを選んでください（バージョン1、最大5 MB）。何も読み込まれていません。", "ディレクトリのお気に入り {directoryAdded} 件、追加情報源 {added} 件を追加予定。重複 {skipped} 件と利用できないURL {unavailable} 件をスキップします。", "ディレクトリのお気に入り {directoryAdded} 件と追加情報源 {added} 件を読み込みました。重複 {skipped} 件と利用できないURL {unavailable} 件をスキップしました。", "読み込みは未完了です。既存の情報は保護されています。ストレージを確認し、再試行して完了してください。"], "ko": ["백업 및 복원", "컬렉션 내보내기 (.json)", "컬렉션 가져오기", "디렉터리 즐겨찾기와 추가한 모든 소스를 하나의 JSON에 백업합니다. 가져오기는 없는 항목만 추가하며 기존 기록은 유지합니다. 이전 내 소스 백업도 지원합니다.", "디렉터리 즐겨찾기 내보내기 (.md)", "컬렉션 또는 이전 내 소스 JSON 백업을 선택하세요 (버전 1, 최대 5 MB). 아무것도 가져오지 않았습니다.", "디렉터리 즐겨찾기 {directoryAdded}개와 추가 소스 {added}개를 추가합니다. 중복 {skipped}개와 사용할 수 없는 URL {unavailable}개를 건너뜁니다.", "디렉터리 즐겨찾기 {directoryAdded}개와 소스 {added}개를 가져왔습니다. 중복 {skipped}개와 사용할 수 없는 URL {unavailable}개를 건너뛰었습니다.", "가져오기가 완료되지 않았습니다. 기존 기록은 안전합니다. 저장소를 확인하고 다시 시도해 완료하세요."]};
+ const exportNames=["backup", "export", "import", "backupHint", "exportDirectory", "invalidBackup", "preview", "imported", "partialImport"];
+ for(const locale of Object.keys(words)){for(const [i,name] of exportNames.entries()){const index=names.indexOf(name);if(index<0)words[locale].push(exportLabels[locale][i]);else words[locale][index]=exportLabels[locale][i];}}names.push(...exportNames.filter(name=>!names.includes(name)));
  const importDialog=$('personal-import-dialog'),fileInput=$('personal-import-file'),importConfirm=$('personal-import-confirm');
  let pendingImport=null,fileSelection=0,lastImport=null;
- const formatCounts=(message,counts)=>label(message).replace('{added}',counts.added).replace('{skipped}',counts.skipped);
+ const formatCounts=(message,counts)=>label(message).replace(/\{(added|skipped|directoryAdded|unavailable)\}/g,(_,name)=>counts[name]);
  function mergeBackup(latest,incoming){
   const urls=new Set(latest.map(s=>webURL(s.url))),next=[...latest];let skipped=0;
   for(const source of incoming){
@@ -961,17 +962,51 @@ document.querySelector('#export-favorites').addEventListener('click',()=>{if(!fa
   }
   return {next,added:next.length-latest.length,skipped};
  }
+ // Plan against current storage both for preview and again at confirmation.
+ function planImport(incoming){
+  const personal=mergeBackup(read(),incoming.sources),favorites=readFavorites();
+  const known=new Map(cards.map(card=>{const url=card.querySelector('.favorite-source').dataset.url;return [webURL(url),url];}));
+  const seen=new Set([...favorites].map(webURL));let directoryAdded=0,unavailable=0,skipped=personal.skipped;
+  for(const url of incoming.directoryFavorites){
+   if(seen.has(url)){skipped++;continue;}seen.add(url);
+   const match=known.get(url);if(!match){unavailable++;continue;}
+   favorites.add(match);directoryAdded++;
+  }
+  return {...personal,favorites:[...favorites],directoryAdded,unavailable,skipped};
+ }
  function previewImport(){
   if(!pendingImport)return;
-  try{$('personal-import-preview').textContent=formatCounts('preview',mergeBackup(read(),pendingImport));}
+  try{$('personal-import-preview').textContent=formatCounts('preview',planImport(pendingImport));}
   catch(error){$('personal-import-error').textContent=label('failure');importConfirm.disabled=true;}
+ }
+ function commitImport(incoming){
+  let counts;
+  try{counts=planImport(incoming);}catch(error){notice('failure');return null;}
+  const changes=[];
+  if(counts.directoryAdded)changes.push({key:'visual-edit-favorites-v1',next:JSON.stringify(counts.favorites)});
+  if(counts.added)changes.push({key,next:JSON.stringify({version:1,sources:counts.next})});
+  const written=[];
+  try{
+   for(const change of changes){change.before=localStorage.getItem(change.key);localStorage.setItem(change.key,change.next);written.push(change);}
+  }catch(error){
+   let incomplete=false;
+   for(const change of written.reverse())try{
+    // Keep a newer change from another tab rather than overwriting it during rollback.
+    if(localStorage.getItem(change.key)!==change.next){incomplete=true;continue;}
+    if(change.before===null)localStorage.removeItem(change.key);else localStorage.setItem(change.key,change.before);
+   }catch(rollbackError){incomplete=true;}
+   try{sources=read();favoriteKeys=readFavorites();}catch(readError){}
+   update();notice(incomplete?'partialImport':'failure');return null;
+  }
+  sources=counts.next;favoriteKeys=new Set(counts.favorites);storageAvailable=true;warning.hidden=true;
+  update();return counts;
  }
  $('collection-export-directory').addEventListener('click',()=>$('export-favorites').click());
  $('personal-export').addEventListener('click',()=>{
   try{
-   const data={format:'the-reference-edit-personal-sources',version:1,exportedAt:new Date().toISOString(),sources:read()};
+   const data={format:'the-reference-edit-collection',version:1,exportedAt:new Date().toISOString(),directoryFavorites:[...readFavorites()].map(webURL),sources:read()};
    const blob=new Blob([JSON.stringify(data,null,2)+'\n'],{type:'application/json'}),url=URL.createObjectURL(blob),a=element('a');
-   a.href=url;a.download='The Reference Edit - My sources.json';document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
+   a.href=url;a.download='The Reference Edit - My collection.json';document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
   }catch(error){notice('corrupt');}
  });
  $('personal-import-open').addEventListener('click',()=>{
@@ -986,19 +1021,21 @@ document.querySelector('#export-favorites').addEventListener('click',()=>{if(!fa
   try{
    if(file.size>5*1024*1024)throw Error('Size');const data=JSON.parse(await file.text());
    if(selection!==fileSelection)return;
-   if(data?.format!=='the-reference-edit-personal-sources'||data.version!==1||!Array.isArray(data.sources)||!data.sources.every(valid))throw Error('Backup');
+   if(!['the-reference-edit-collection','the-reference-edit-personal-sources'].includes(data?.format)||data.version!==1||!Array.isArray(data.sources)||!data.sources.every(valid))throw Error('Backup');
+   const directoryFavorites=data.format==='the-reference-edit-collection'?data.directoryFavorites:[];
+   if(!Array.isArray(directoryFavorites)||!directoryFavorites.every(url=>typeof url==='string'&&url.length<=2048))throw Error('Favorites');
    const incoming=data.sources.map(source=>{
     const clean={id:source.id,favorite:source.favorite};for(const name of Object.keys(fields))clean[name]=source[name];
     clean.url=webURL(clean.url);if(clean.image)clean.image=webURL(clean.image);if(!valid(clean))throw Error('Backup');return clean;
    });
-   pendingImport=incoming;importConfirm.disabled=false;previewImport();
+   pendingImport={sources:incoming,directoryFavorites:directoryFavorites.map(webURL)};importConfirm.disabled=false;previewImport();
   }catch(error){if(selection===fileSelection)$('personal-import-error').textContent=label('invalidBackup');}
  });
  $('personal-import-cancel').addEventListener('click',()=>importDialog.close());
  importDialog.addEventListener('close',()=>{if(importDialog.open)return;fileSelection++;pendingImport=null;$('personal-import-open').focus({preventScroll:true});});
  importConfirm.addEventListener('click',()=>{
-  if(!pendingImport)return;let counts;
-  if(commit(latest=>{counts=mergeBackup(latest,pendingImport);return counts.next;})){
+  if(!pendingImport)return;const counts=commitImport(pendingImport);
+  if(counts){
    only=false;kind='all';$('personal-search').value='';render();lastImport=counts;importDialog.close();$('personal-transfer-status').textContent=formatCounts('imported',counts);
   }else $('personal-import-error').textContent=warning.textContent;
  });
