@@ -9,6 +9,9 @@ for (const [map, revision] of [[oldFiles, 'old'], [files, 'new']]) {
 }
 const cacheName = map => map.get('/sw.js').toString().match(/const CACHE='([^']+)'/)[1];
 const oldCache = cacheName(oldFiles), newCache = cacheName(files);
+const newShell = vm.runInNewContext(files.get('/sw.js').toString().match(/const SHELL=(\[[^;]+\]);/)[1]);
+const imagePaths = [...files.keys()].filter(path=>path.startsWith('/images/'));
+const logoPath = imagePaths.find(path=>!newShell.includes(path));
 assert.notEqual(oldCache, newCache, 'Migration fixture must have an older shell version');
 new vm.Script(files.get('/sw.js').toString());
 let revision = 'old', mode = 'online', connected = true;
@@ -17,6 +20,7 @@ const page = await browser((req, res, later) => {
   // Block the server as well: page-level CDP offline emulation alone may leave worker fetches online.
   if (!connected) {req.socket.destroy(); return;}
   const pathname = new URL(req.url, 'http://localhost').pathname;
+  if (mode === 'image-error' && pathname === logoPath) {res.writeHead(503); res.end(); return;}
   if (mode === 'broken-install' && pathname === '/icons/icon-512.png') {res.writeHead(503); res.end(); return;}
   if (mode === 'error' && (pathname === '/' || pathname === '/index.html')) {res.writeHead(503); res.end(); return;}
   if (pathname === '/index.html') {res.writeHead(302, {Location: '/'}); res.end(); return;}
@@ -64,18 +68,33 @@ try {
   await pause(300); assert.equal(page.navigations.length, initialNavigations, 'Automatic update caused unexpected reloads');
   check('Upgrade activates and removes old app cache without reload loops');
   async function verify() {
+    assert.ok(await ev("document.fonts.size===2&&[...document.fonts].every(f=>f.status==='loaded')"), 'Offline shell fonts unavailable');
     assert.deepEqual(await ev('({...localStorage})'), saved, 'Preferences changed');
     assert.deepEqual(await ev(`({revision:document.querySelector('[name=test-revision]').content,lang:document.documentElement.lang,theme:document.documentElement.dataset.theme,favorites:favoriteKeys.size,country:document.querySelector('#country-filter').value,controlled:!!navigator.serviceWorker.controller})`),
       {revision: 'new', lang: 'es', theme: 'dark', favorites: 2, country: 'Japan', controlled: true});
   }
   await offline(true); await navigate('', true); await verify();
+  assert.ok(await ev("document.querySelector('.cover-image img').decode().then(()=>true)"), 'Precached cover unavailable on first offline reload');
   check('First reload after upgrade displays new revision offline; preferences and shared filters retained');
   await offline(false);
+  mode = 'online'; await navigate('', true);
+  assert.ok(await ev("Promise.all([...document.images].map(i=>i.decode())).then(()=>true)"), 'External images did not decode');
+  await until(`caches.open(${JSON.stringify(newCache)}).then(async c=>(await Promise.all(${JSON.stringify(imagePaths)}.map(p=>c.match(p)))).every(Boolean))`, 'On-demand images were not cached');
+  check('Cover is precached; all source logos cache on demand after a controlled online visit');
+  // An HTTP failure must not poison a logo cache entry, and a later visit can retry it.
+  await ev(`caches.open(${JSON.stringify(newCache)}).then(c=>c.delete(${JSON.stringify(logoPath)}))`);
+  mode = 'image-error';
+  assert.equal(await ev(`fetch(${JSON.stringify(logoPath)}).then(r=>r.status)`), 503);
+  assert.equal(await ev(`caches.open(${JSON.stringify(newCache)}).then(c=>c.match(${JSON.stringify(logoPath)})).then(Boolean)`), false);
+  mode = 'online';
+  assert.equal(await ev(`fetch(${JSON.stringify(logoPath)}).then(r=>r.status)`), 200);
+  check('Failed image downloads stay uncached and succeed on retry');
   for (const scenario of ['online', 'error', 'slow-headers', 'slow-body', 'offline']) {
     mode = scenario === 'offline' ? 'online' : scenario;
     if (scenario === 'offline') await offline(true);
     const before = page.navigations.length, durationMs = await navigate('', true);
     await verify(); await pause(250);
+    assert.ok(await ev("Promise.all([...document.images].map(i=>i.decode())).then(()=>true)"), `${scenario}: cached images unavailable`);
     assert.equal(page.navigations.length, before + 1, 'Reload loop');
     if (scenario.startsWith('slow-')) assert.ok(durationMs < 6500, `${scenario}: fallback took ${durationMs}ms (4s network budget)`);
     check(scenario + ' reload', {durationMs});
@@ -89,7 +108,7 @@ try {
     const keys=await caches.keys(),shell=await caches.open(${JSON.stringify(newCache)});
     const ready=await new Promise(resolve=>{const m=new MessageChannel();m.port1.onmessage=e=>{m.port1.close();resolve(e.data.ready);};navigator.serviceWorker.controller.postMessage({type:'OFFLINE_STATUS'},[m.port2]);});
     return {keys,assets:(await shell.keys()).length,ready};})()`);
-  assert.equal(cache.assets, 7); assert.ok(cache.ready); assert.ok(cache.keys.includes('unrelated-project-cache')); assert.ok(!cache.keys.includes(oldCache));
+  assert.equal(cache.assets, newShell.length + imagePaths.filter(path=>!newShell.includes(path)).length); assert.ok(cache.ready); assert.ok(cache.keys.includes('unrelated-project-cache')); assert.ok(!cache.keys.includes(oldCache));
   assert.deepEqual(page.exceptions, []); result.cache = cache; result.passed = true;
 } catch (error) {result.passed = false; result.error = error.stack; process.exitCode = 1;}
 finally {await page.close(); await report('service-worker', result);}

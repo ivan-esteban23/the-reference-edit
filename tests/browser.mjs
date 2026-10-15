@@ -108,7 +108,8 @@ export function serve(files, req, res) {
   const key = pathname === '/' ? '/index.html' : pathname, body = files.get(key);
   if (!body) {res.writeHead(404); res.end(); return;}
   res.setHeader('Cache-Control', 'no-store');
-  res.setHeader('Content-Type', key.endsWith('.html') ? 'text/html; charset=utf-8' : key.endsWith('.js') ? 'text/javascript' : key.endsWith('.svg') ? 'image/svg+xml' : key.endsWith('.webmanifest') ? 'application/manifest+json' : 'image/png');
+  const types = {'.html':'text/html; charset=utf-8','.js':'text/javascript','.svg':'image/svg+xml','.webmanifest':'application/manifest+json','.png':'image/png','.jpg':'image/jpeg','.gif':'image/gif','.ico':'image/x-icon','.ttf':'font/ttf'};
+  res.setHeader('Content-Type', types[path.extname(key)] || 'application/octet-stream');
   res.end(body);
 }
 export async function report(name, result) {
