@@ -1,3 +1,11 @@
+# Editorial app icon — 15 October 2026
+
+Replaced the old VE mark with an original ivory RE serif monogram on near-black. New asset URLs cover browser, Apple touch, standard install and Android maskable icons; legacy icon URLs also serve the new artwork. The worker precaches the new icons with a fresh shell version.
+
+Validation: `node tests/site.mjs` passed all 96 layout cases and interactions; all 58 source records, 59 cover/source images and both fonts retain their original content. `node tests/pages.mjs` passed project-path installation, decoded manifest icon dimensions and offline persistence. `node tests/service-worker.mjs` passed historical worker migration, failed-install recovery and offline navigation. `node --test tests/worker-storage.mjs` passed all 10 storage-failure checks. `git diff --check` passed.
+
+Visually reviewed square, circular, 56 px phone and 32 px browser previews in Chromium. The opaque 512 px maskable image keeps bright lettering within a 187.5 px radius, inside Android's 204.8 px safe circle. Physical-device installation and existing shortcut icon refresh remain unverified; a cached shortcut may need to be removed and added again after deployment.
+
 # Saved directory notes validation
 
 Saved directory cards now offer Add/Edit note with a native editor, clear-to-delete behavior and plain-text display. Collection search includes note text. Notes are retained when a source is unsaved and reappear when it is saved again; retained-note guidance and notes-only export prevent accidental loss. All six languages have translated controls and recovery messages. Note text stays unchanged and is not added to URLs.

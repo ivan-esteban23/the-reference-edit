@@ -34,6 +34,10 @@ try{
  const registration=await page.evaluate('navigator.serviceWorker.getRegistration().then(r=>({scope:r.scope,script:r.active.scriptURL}))');
  assert.equal(registration.scope,page.origin+base);assert.equal(registration.script,page.origin+base+'sw.js');
  for(const asset of [...manifest.icons,...manifest.screenshots])assert.equal(await page.evaluate(`fetch(${JSON.stringify(asset.src)}).then(r=>r.status)`),200);
+ for(const icon of manifest.icons){
+  const dimensions=await page.evaluate(`(async()=>{const i=new Image();i.src=${JSON.stringify(icon.src)};await i.decode();return i.naturalWidth+'x'+i.naturalHeight;})()`);
+  assert.equal(dimensions,icon.sizes);
+ }
  assert.ok(await page.evaluate("Promise.all([...document.images].map(i=>i.decode())).then(()=>true)"));
  assert.ok(await page.evaluate("document.fonts.size===2&&[...document.fonts].every(f=>f.status==='loaded')"));
  assert.deepEqual((await page.call('Page.getInstallabilityErrors')).installabilityErrors,[]);

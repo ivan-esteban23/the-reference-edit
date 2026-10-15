@@ -7,9 +7,14 @@ const files = await assets(), html = files.get('/index.html').toString();
 const before = gitFile(baseline, 'dist/index.html').toString();
 const records = source => [...source.matchAll(/<article\b[^>]*class="source"[\s\S]*?<\/article>/g)].map(m => m[0]);
 // Image URLs are the only permitted source-record change: verify every original byte first.
-const embedded = [...before.matchAll(/data:image\/([^;]+);base64,([A-Za-z0-9+/=]+)/g)];
+const originalImages = [...before.matchAll(/data:image\/([^;]+);base64,([A-Za-z0-9+/=]+)/g)];
+// The original favicon is intentionally replaced; preserve every cover/source image.
+assert.equal(originalImages.length, 60);
+assert.equal(originalImages[0][1], "svg+xml");
+assert.equal(createHash("sha256").update(Buffer.from(originalImages[0][2], "base64")).digest("hex").slice(0,16), "85cfa79ee7373f6f");
+const embedded = originalImages.slice(1);
 const extracted = [...html.matchAll(/images\/image-[a-f0-9]{16}\.(?:png|jpg|gif|ico|svg)/g)];
-assert.equal(embedded.length, 60); assert.equal(extracted.length, embedded.length);
+assert.equal(embedded.length, 59); assert.equal(extracted.length, embedded.length);
 assert.ok(!html.includes('data:image/'), 'An image remains embedded');
 const extensions = {'svg+xml':'svg',jpeg:'jpg',png:'png','x-icon':'ico',gif:'gif'};
 let restored = html;
@@ -51,7 +56,7 @@ const key = async (key, code = key) => {
 try {
   await navigate();
   assert.ok(await ev("Promise.all([...document.images].map(i=>i.decode())).then(()=>[...document.images].every(i=>i.naturalWidth>0))"), 'Extracted images did not render');
-  check('All 60 extracted images retain their bytes and all page images decode');
+  check('All 59 cover/source images retain their bytes and all page images decode');
   assert.ok(await ev("document.fonts.size===2&&[...document.fonts].every(f=>f.status==='loaded')"), 'External fonts failed to load');
   check('Both extracted fonts retain their original bytes and load successfully');
   await call('Emulation.setDeviceMetricsOverride',{width:390,height:844,deviceScaleFactor:1,mobile:false});

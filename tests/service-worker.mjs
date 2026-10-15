@@ -3,6 +3,7 @@ import vm from 'node:vm';
 import {assets, baseline, browser, gitFile, pause, report, serve} from './browser.mjs';
 
 const files = await assets(), oldFiles = new Map(files);
+const installIcon = JSON.parse(files.get("/manifest.webmanifest")).icons.find(icon=>icon.sizes==="512x512"&&icon.purpose==="any").src;
 for (const name of ['index.html', 'sw.js']) oldFiles.set('/' + name, gitFile(baseline, 'dist/' + name));
 for (const [map, revision] of [[oldFiles, 'old'], [files, 'new']]) {
   map.set('/index.html', Buffer.from(map.get('/index.html').toString().replace('<head>', `<head><meta name="test-revision" content="${revision}">`)));
@@ -21,7 +22,7 @@ const page = await browser((req, res, later) => {
   if (!connected) {req.socket.destroy(); return;}
   const pathname = new URL(req.url, 'http://localhost').pathname;
   if (mode === 'image-error' && pathname === logoPath) {res.writeHead(503); res.end(); return;}
-  if (mode === 'broken-install' && pathname === '/icons/icon-512.png') {res.writeHead(503); res.end(); return;}
+  if (mode === 'broken-install' && pathname === installIcon) {res.writeHead(503); res.end(); return;}
   if (mode === 'error' && (pathname === '/' || pathname === '/index.html')) {res.writeHead(503); res.end(); return;}
   if (pathname === '/index.html') {res.writeHead(302, {Location: '/'}); res.end(); return;}
   if (pathname === '/' && mode.startsWith('slow-')) {
