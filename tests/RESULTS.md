@@ -1,3 +1,11 @@
+# Linux launcher icon discovery — 15 October 2026
+
+Omarchy's web-app installer reads the first 100 KB of raw HTML for an Apple touch icon and does not execute JavaScript. The site previously added that link dynamically, forcing origin-root and external fallback lookups that can fail for a GitHub Pages project.
+
+Moved the existing 180 px PNG link into the initial static head, before the stylesheet, and removed its duplicate dynamic insertion. Pages preparation supplies the correct project-prefixed URL. Versioned the source offline shell for the HTML change.
+
+Regression evidence: the raw-HTML check failed before the fix with “Omarchy cannot discover a static Apple touch icon in the first 100 KB” and passes afterward using Omarchy's shell extraction pipeline. It downloads the project-path icon without JavaScript and verifies HTTP 200, PNG content type and PNG signature. `node tests/pages.mjs`, `node tests/site.mjs` (96 layouts and interactions) and `node tests/service-worker.mjs` passed; `git diff --check` passed. The physical Linux desktop installer was not run in this cloud environment.
+
 # Editorial app icon — 15 October 2026
 
 Replaced the old VE mark with an original ivory RE serif monogram on near-black. New asset URLs cover browser, Apple touch, standard install and Android maskable icons; legacy icon URLs also serve the new artwork. The worker precaches the new icons with a fresh shell version.

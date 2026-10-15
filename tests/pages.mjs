@@ -23,6 +23,16 @@ try{
   req.url='/'+req.url.slice(base.length);serve(files,req,res);
  });
  files.set('/seed.html',Buffer.from('<!doctype html><title>Cache migration fixture</title>'));
+ // Omarchy scans only the first 100 KB of raw HTML; it does not execute scripts.
+ const raw=await (await fetch(page.origin+base)).text();
+ const discovered=execFileSync('bash',['-c',String.raw`tr '\n' ' ' | grep -oiE "<link[^>]*rel=[\"'][^\"']*apple-touch-icon[^\"']*[\"'][^>]*>" | grep -oiE "href=[\"'][^\"']+" | head -1 | sed -E "s/^href=[\"']//"`],{input:Buffer.from(raw).subarray(0,100000),encoding:'utf8'}).trim();
+ assert.ok(discovered,'Omarchy cannot discover a static Apple touch icon in the first 100 KB');
+ // Match Omarchy's root-relative URL handling; avoid a false pass from browser URL resolution.
+ assert.equal(discovered,base+'icons/reference-edit-apple-touch-180.png');
+ const iconResponse=await fetch(page.origin+discovered);
+ assert.equal(iconResponse.status,200);assert.match(iconResponse.headers.get('content-type'),/^image\/png/);
+ assert.deepEqual(Buffer.from(await iconResponse.arrayBuffer()).subarray(0,8),Buffer.from([137,80,78,71,13,10,26,10]));
+ check('Omarchy discovers and downloads the PNG from raw HTML under the Pages project path');
  await page.call('Page.navigate',{url:page.origin+base+'seed.html'});
  await page.until("location.pathname.endsWith('/seed.html')&&document.readyState==='complete'");
  await page.evaluate("Promise.all(['reference-edit-phone-preview-shell-old','unrelated-project-cache'].map(async name=>{const c=await caches.open(name);await c.put('/fixture',new Response('keep'));}))");
