@@ -1,0 +1,41 @@
+{
+  "version": 1,
+  "references": [
+    {
+      "id": "tokyo-street-01",
+      "source": "Tokyo street research",
+      "sourceUrl": "",
+      "city": "Tokyo",
+      "context": "Harajuku casual street style",
+      "date": "2026-10-15",
+      "caption": "Layered autumn street styling with oversized outerwear, patterned tights, and casual sneakers.",
+      "image": "/images/references/tokyo-street/tokyo-street-01.jpg",
+      "license": "placeholder",
+      "tags": ["tokyo", "street-style", "layering", "casual", "18-25"]
+    },
+    {
+      "id": "seoul-fashion-week-01",
+      "source": "Seoul Fashion Week street research",
+      "sourceUrl": "",
+      "city": "Seoul",
+      "context": "Fashion-week street style",
+      "date": "2026-10-15",
+      "caption": "Cropped shearling jacket, wide cargo trousers, combat boots, and a structured mini bag.",
+      "image": "/images/references/seoul-fashion-week/seoul-fashion-week-01.jpg",
+      "license": "placeholder",
+      "tags": ["seoul", "fashion-week", "street-style", "outerwear", "18-25"]
+    },
+    {
+      "id": "paris-office-01",
+      "source": "Paris everyday office research",
+      "sourceUrl": "",
+      "city": "Paris",
+      "context": "Everyday office wear",
+      "date": "2026-10-15",
+      "caption": "Camel trench coat, Breton stripe, straight-leg denim, and leather loafers.",
+      "image": "/images/references/paris-office/paris-office-01.jpg",
+      "license": "placeholder",
+      "tags": ["paris", "office", "everyday", "tailoring", "workwear"]
+    }
+  ]
+}
