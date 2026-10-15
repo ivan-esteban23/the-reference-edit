@@ -71,6 +71,34 @@ try {
   assert.ok(await ev("document.querySelector('#storage-warning').getClientRects().length>0"),'Storage warning hidden inside collapsed tools');
   await ev('storageAvailable=true;refreshFavorites()');
   check('Compact mobile entry reaches search/cards sooner and keeps collection tools accessible');
+  const topicNames=['typography','photography','fashion','architecture','graphic-design'];
+  const visibleURLs=()=>ev("cards.filter(c=>!c.hidden).map(c=>c.querySelector('.favorite-source').dataset.url)");
+  for(const topicName of topicNames){
+    await ev(`document.querySelector('[data-topic="${topicName}"]').click()`);
+    const expectedCounts={typography:4,photography:5,fashion:15,architecture:5,'graphic-design':5};
+    const examples={typography:'https://www.printedmatter.org/',photography:'https://www.nowness.com/',fashion:'https://www.vogue.com/fashion-shows',architecture:'https://www.apartamentomagazine.com/','graphic-design':'https://magazine-b.com/'};
+    const found=await visibleURLs();assert.equal(found.length,expectedCounts[topicName]);assert.ok(found.includes(examples[topicName]));
+    assert.ok(!found.includes('https://www.pureref.com/'),'Organizing software leaked into a visual topic');
+    assert.equal(await ev("activeFilterCount()"),1);
+    assert.equal(await ev("document.querySelectorAll('[data-topic][aria-pressed=true]').length"),1);
+    assert.ok(await ev(`location.hash.includes('topic=${topicName}')`));
+  }
+  await search('behance');assert.equal((await visibleURLs()).length,1);
+  await select('#country-filter','Japan');assert.equal((await visibleURLs()).length,0);
+  await ev("document.querySelector('#reset').click()");assert.equal((await visibleURLs()).length,58);
+  await ev("document.querySelector('[data-topic=photography]').focus()");await key('Enter');
+  assert.equal(await ev('topic'),'photography');
+  await navigate('',true);assert.equal(await ev('topic'),'photography');
+  assert.equal(await ev("document.querySelector('[data-topic=photography]').getAttribute('aria-pressed')"),'true');
+  await ev("document.querySelector('[data-remove-filter=topic]').click()");assert.equal((await visibleURLs()).length,58);
+  await ev("document.querySelector('[data-topic=architecture]').click();document.querySelector('[data-topic=\"\"]').click()");
+  assert.equal(await ev('activeFilterCount()'),0);
+  await navigate('/?topic-check=invalid#directory?topic=not-a-topic');assert.equal(await ev('topic'),'');assert.equal((await visibleURLs()).length,58);
+  await ev("document.querySelector('[data-topic=typography]').click();document.querySelector('[data-browse-country=Japan]').click()");
+  assert.equal(await ev('topic'),'');assert.ok((await visibleURLs()).length>0);
+  await ev("document.querySelector('#reset').click()");
+  check('Five curated topics combine with search/country, support keyboard activation, URL reload, reset, removal and country navigation');
+
   assert.equal(await ev("document.querySelectorAll('.research-route').length"),3);
   assert.ok(await ev("[...document.querySelectorAll('#routes details')].every(d=>!d.open)"));
   // Exercise disclosures while measuring; a collapsed page can hide overflow bugs.
@@ -85,7 +113,7 @@ try {
       const errors=[],describe=e=>e.id||e.className||e.tagName;
       const overlap=(a,b)=>a.left<b.right-1&&b.left<a.right-1&&a.top<b.bottom-1&&b.top<a.bottom-1;
       if(document.documentElement.scrollWidth>innerWidth+1)errors.push('document overflow');
-      const selectors='.research-route summary strong,.research-route .route-body h4,.research-route .route-body p,.guide-record summary,.hero h1,.cover-image figcaption,.hero-actions a,.masthead>span,.masthead button,.language-switch,.controls input,.controls button,.source h3,.source-purpose,.source-actions button,.source-details summary,.filter-field label,.footer-nav a';
+      const selectors='.topic-shortcuts p,.topic-buttons button,.research-route summary strong,.research-route .route-body h4,.research-route .route-body p,.guide-record summary,.hero h1,.cover-image figcaption,.hero-actions a,.masthead>span,.masthead button,.language-switch,.controls input,.controls button,.source h3,.source-purpose,.source-actions button,.source-details summary,.filter-field label,.footer-nav a';
       for(const e of document.querySelectorAll(selectors)){
         if(!visible(e))continue;const r=e.getBoundingClientRect();
         if(r.left < -1 || r.right>innerWidth+1)errors.push('outside viewport: '+describe(e));
@@ -104,6 +132,7 @@ try {
       if(getComputedStyle(bar).position==='sticky'&&bar.getBoundingClientRect().height>innerHeight*.4)errors.push('sticky search consumes viewport');
       return {errors,lang:document.documentElement.lang,code:document.querySelector('.language-code').dataset.code};
     })()`);
+    assert.equal(await ev("document.querySelector('[data-topic=photography]').textContent"),({en:'Photography',es:'Fotografía','zh-Hans':'摄影','zh-Hant':'攝影',ja:'写真',ko:'사진'})[locale]);
     result.layouts.push({width, size, theme, locale, ...layout});
     if(locale==='ko')console.log(`Layout ${width}px / ${size}% / ${theme}`);
   }

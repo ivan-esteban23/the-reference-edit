@@ -41,10 +41,10 @@ try{
  assert.equal(await ev("document.querySelector('[data-chooser-save]').getAttribute('aria-pressed')"),'true');
  check('Save/remove synchronizes collection counts, retains keyboard focus, handles storage failures and persists after reload');
 
- await ev("search.value='no-such-source';countryFilter.value='France';update()");await choose('street');
+ await ev("document.querySelector('[data-topic=architecture]').click();search.value='no-such-source';countryFilter.value='France';update()");await choose('street');
  assert.equal(await ev("search.value==='no-such-source'&&countryFilter.value==='France'"),true);
  await click('[data-chooser-view]');
- assert.equal(await ev('activeFilterCount()'),0);
+ assert.equal(await ev('activeFilterCount()'),0);assert.equal(await ev('topic'),'');
  assert.ok(await ev(`document.activeElement.closest('.source').querySelector('.favorite-source').dataset.url===${JSON.stringify(selections.street[0])}&&document.activeElement.closest('.source').querySelector('.source-details').open`));
  check('Choosing a goal leaves directory filters intact; View reveals the selected full record and focuses its link');
 

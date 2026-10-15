@@ -1,3 +1,9 @@
+# Topic shortcuts — 15 October 2026
+
+Added five translated topic shortcuts below directory search: Typography, Photography, Fashion, Architecture and Graphic Design, plus All topics. Topics use stable catalog URLs for curated selections (Fashion uses the existing Fashion references category), combine with search/category/country/coverage/access/favorites, and appear as removable filter chips. Shared links retain the selected topic; unknown topics are ignored. Reset, country browsing, show-all-saved and full-record navigation clear topics when revealing their intended results. Updated the offline shell version.
+
+Passed `node tests/site.mjs` (96 layouts across six languages, two text sizes, two themes and four widths), `node tests/chooser.mjs` (96 layouts and full-record navigation), `node tests/pages.mjs` (installability, Linux icon discovery and offline topic restoration/switching), and `node tests/service-worker.mjs` (migration/offline/error handling). A focused site interaction rerun passed after strengthening topic result-count/example assertions. Verified all 58 source records, 59 cover/source images and both fonts retain their original content. Visually inspected 390 px and 1440 px previews. `git diff --check` passed. Validation uses Chromium; physical phones and other browser engines were not tested.
+
 # Linux launcher icon discovery — 15 October 2026
 
 Omarchy's web-app installer reads the first 100 KB of raw HTML for an Apple touch icon and does not execute JavaScript. The site previously added that link dynamically, forcing origin-root and external fallback lookups that can fail for a GitHub Pages project.
