@@ -50,6 +50,8 @@ try{
  await page.navigate(base+'index.html#my-sources');assert.deepEqual(await page.evaluate('({...localStorage})'),saved);
  assert.ok(await page.evaluate("!document.querySelector('#my-sources').hidden&&document.querySelector('#mobile-saved-count').textContent==='2'"));
  await page.evaluate("location.hash='#workflow'");await page.until("document.querySelector('#workflow').open&&!collectionOpen");
+ await page.evaluate("location.hash='#source-chooser'");await page.until("document.querySelector('#source-chooser').open");
+ await page.evaluate("document.querySelector('[data-chooser-goal=history]').click()");assert.equal(await page.evaluate("document.querySelectorAll('.chooser-card').length"),3);
  assert.deepEqual(page.exceptions,[]);
  check('Published paths preserve favorites and personal records during offline reload and index navigation');
  result.passed=true;

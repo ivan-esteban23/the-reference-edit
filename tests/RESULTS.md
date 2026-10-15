@@ -1,3 +1,11 @@
+# Source chooser validation
+
+Added a collapsed “Help me choose” shortcut to the directory introduction, with links from all three research guides. Four goals—editorial design, fashion history, street style and organizing references—each offer three maintained catalog entries with a short reason and access status. Suggestions use separate `.chooser-card` elements; all 58 original `.source` records remain unchanged. New controls/copy support all six languages. There are no new services, accounts or saved preference keys.
+
+Save/remove delegates to existing directory favorites, synchronizing the collection and preserving keyboard focus. Storage failures keep the saved selection unchanged and show a warning in the chooser. “View in directory” clears filters, expands the selected full record and focuses its source link. Choosing a goal alone does not change directory filters. Goal selection survives language changes in the current page and resets on reload.
+
+Passed locally: chooser (five functional groups, 96 viewport/text-size/theme/language cases), site (96 expanded layouts, twelve groups), Pages (four groups including the prefixed offline chooser), and worker migration/navigation (twelve groups). Tests cover catalog mappings, translations, persistence, collection counts, write failures, focus, deep links and offline use. Mobile capture inspected. Original images/fonts retain their bytes. Worker key: `visual-edit-shell-chooser-v1`. Physical-phone/Safari review and publication remain pending; CI runs the complete regression suite.
+
 # Simpler research guides validation
 
 Consolidated four overlapping guide sections into one Research guides destination immediately after the directory. Three short choices—Find inspiration, Research a topic and Build a moodboard—open to three steps with relevant source links. Vintage identification, source-language searching and photo-shoot examples remain inside the appropriate paths. One expandable reference template retains credit/date/context fields and image-use guidance. Removed obsolete list-change/report notes and repeated navigation entries; editor selections, regional recommendations and all 58 source records remain intact.
