@@ -33,7 +33,7 @@ try{
  await seed(urls.slice(0,2),records);
  await ev("document.querySelector('[data-collection-kind=personal]').click();document.querySelector('#personal-search').value='nothing';document.querySelector('#personal-search').dispatchEvent(new Event('input'))");
  const exported=await download('complete');
- assert.equal(exported.format,'the-reference-edit-collection');assert.equal(exported.version,1);assert.ok(!Number.isNaN(Date.parse(exported.exportedAt)));
+ assert.equal(exported.format,'the-reference-edit-collection');assert.equal(exported.version,2);assert.ok(!Number.isNaN(Date.parse(exported.exportedAt)));
  assert.deepEqual(exported.directoryFavorites,urls.slice(0,2));assert.deepEqual(exported.sources,records);
  await seed(urls.slice(0,1),[]);assert.equal(await ev("document.querySelector('#personal-export').disabled"),false);
  const directoryOnly=await download('directory-only');assert.deepEqual(directoryOnly.directoryFavorites,urls.slice(0,1));assert.deepEqual(directoryOnly.sources,[]);
@@ -57,7 +57,7 @@ try{
  assert.deepEqual(JSON.parse(merged.favorites),urls.slice(0,3));
  check('Merge preserves existing records, skips duplicate URLs, remaps IDs and reports unavailable directory entries');
 
- for(const invalid of [backup(['javascript:alert(1)'],[source('safe')]),backup('not-an-array',[]),{...backup([],[]),version:2},backup([urls[3]],[source('unsafe',{url:'data:text/html,x'})])]){
+ for(const invalid of [backup(['javascript:alert(1)'],[source('safe')]),backup('not-an-array',[]),{...backup([],[]),version:3},backup([urls[3]],[source('unsafe',{url:'data:text/html,x'})])]){
   const before=await stored();await click('#personal-import-open');await choose(invalid);
   assert.equal(await ev("document.querySelector('#personal-import-confirm').disabled"),true);assert.deepEqual(await stored(),before);await click('#personal-import-cancel');
  }

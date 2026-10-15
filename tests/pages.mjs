@@ -39,10 +39,12 @@ try{
  assert.deepEqual((await page.call('Page.getInstallabilityErrors')).installabilityErrors,[]);
  check('Project-path manifest, worker scope, images, fonts and installability work');
  await page.evaluate("document.querySelector('.favorite-source').click();document.querySelector('#personal-add').click();const f=document.querySelector('#personal-form');f.elements.name.value='Pages reference';f.elements.url.value='https://example.com/pages';f.elements.description.value='Project-path persistence';f.requestSubmit();");
+ await page.evaluate("document.querySelector('[data-collection-action=note]').click();document.querySelector('#directory-note-input').value='Project-path note';document.querySelector('#directory-note-form').requestSubmit()");
  const saved=await page.evaluate('({...localStorage})');
  offline=true;await page.call('Network.emulateNetworkConditions',{offline:true,latency:0,downloadThroughput:-1,uploadThroughput:-1});await page.navigate(base,true);
  assert.deepEqual(await page.evaluate('({...localStorage})'),saved);
  assert.equal(await page.evaluate("document.querySelectorAll('.personal-source').length"),1);
+ assert.equal(await page.evaluate("document.querySelector('.directory-note-text').textContent"),'Project-path note');
  assert.ok(await page.evaluate("Promise.all([...document.images].map(i=>i.decode())).then(()=>true)"));
  assert.ok(await page.evaluate("document.fonts.size===2&&[...document.fonts].every(f=>f.status==='loaded')"));
  await page.evaluate("document.querySelector('#mobile-saved').click()");

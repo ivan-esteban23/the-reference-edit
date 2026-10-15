@@ -29,7 +29,7 @@ try{
  let downloaded;
  for(let n=0;n<100;n++){downloaded=(await readdir(directory)).find(f=>f.endsWith('.json'));if(downloaded)break;await pause(50);}
  assert.ok(downloaded,'Backup download missing');const exported=JSON.parse(await readFile(path.join(directory,downloaded),'utf8'));
- assert.equal(exported.format,'the-reference-edit-collection');assert.deepEqual(exported.directoryFavorites,[]);assert.equal(exported.version,1);assert.ok(!Number.isNaN(Date.parse(exported.exportedAt)));
+ assert.equal(exported.format,'the-reference-edit-collection');assert.deepEqual(exported.directoryFavorites,[]);assert.equal(exported.version,2);assert.ok(!Number.isNaN(Date.parse(exported.exportedAt)));
  assert.deepEqual(exported.sources,records);
  check('Real JSON download includes every source, metadata, image URL, Unicode and favorites despite filters');
  await ev(`localStorage.removeItem(${JSON.stringify(key)});dispatchEvent(new StorageEvent('storage',{key:${JSON.stringify(key)}}))`);
