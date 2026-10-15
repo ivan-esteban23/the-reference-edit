@@ -61,7 +61,7 @@ try{
  await click('[data-collection-action=note]');await draft('Cannot overwrite');await save();assert.equal(await ev(`localStorage.getItem(${JSON.stringify(notesKey)})`),'{broken');await click('#directory-note-cancel');await seedNotes(good);
  check('Quota/corrupt storage preserves drafts and data; same-note conflicts are reported while unrelated edits are kept');
 
- const exported=await download('notes');assert.equal(exported.version,2);assert.equal(exported.format,'the-reference-edit-collection');assert.deepEqual(exported.directoryNotes,good);
+ const exported=await download('notes');assert.equal(exported.version,3);assert.equal(exported.format,'the-reference-edit-collection');assert.deepEqual(exported.directoryNotes,good);
  await ev(`localStorage.removeItem(${JSON.stringify(notesKey)});localStorage.setItem(${JSON.stringify(favoriteKey)},'[]');dispatchEvent(new StorageEvent('storage',{key:null}))`);
  await click('#personal-import-open');await choose(exported);assert.ok(await ev("document.querySelector('#personal-import-preview').textContent.includes('Notes to add: 2')"));assert.deepEqual(await notes(),[]);
  await click('#personal-import-confirm');assert.deepEqual(await notes(),good);
@@ -73,7 +73,7 @@ try{
  }
  const extra={...exported,directoryFavorites:[],sources:[],directoryNotes:[{url:urls[0],text:'Do not replace'},{url:urls[2],text:'Retained without a favorite'}]};
  await click('#personal-import-open');await choose(extra);await click('#personal-import-confirm');assert.equal((await notes())[0].text,good[0].text);assert.equal((await notes()).length,3);
- check('Version 2 backups restore notes; both version 1 formats preserve notes; merge keeps existing text and unsaved-source notes');
+ check('Version 2 and 3 backups restore notes; both version 1 formats preserve notes; merge keeps existing text and unsaved-source notes');
 
  for(const invalid of [{url:'javascript:alert(1)',text:'unsafe'},{url:urls[0],text:'x'.repeat(2001)}]){
   const before=await snapshot();await click('#personal-import-open');await choose({...exported,directoryNotes:[invalid]});assert.equal(await ev("document.querySelector('#personal-import-confirm').disabled"),true);assert.deepEqual(await snapshot(),before);await click('#personal-import-cancel');
