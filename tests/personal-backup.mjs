@@ -29,12 +29,12 @@ try{
  let downloaded;
  for(let n=0;n<100;n++){downloaded=(await readdir(directory)).find(f=>f.endsWith('.json'));if(downloaded)break;await pause(50);}
  assert.ok(downloaded,'Backup download missing');const exported=JSON.parse(await readFile(path.join(directory,downloaded),'utf8'));
- assert.equal(exported.format,'the-reference-edit-personal-sources');assert.equal(exported.version,1);assert.ok(!Number.isNaN(Date.parse(exported.exportedAt)));
+ assert.equal(exported.format,'the-reference-edit-collection');assert.deepEqual(exported.directoryFavorites,[]);assert.equal(exported.version,1);assert.ok(!Number.isNaN(Date.parse(exported.exportedAt)));
  assert.deepEqual(exported.sources,records);
  check('Real JSON download includes every source, metadata, image URL, Unicode and favorites despite filters');
  await ev(`localStorage.removeItem(${JSON.stringify(key)});dispatchEvent(new StorageEvent('storage',{key:${JSON.stringify(key)}}))`);
  await click('#personal-import-open');await choose(exported);assert.equal((await stored()),null);
- assert.equal(await ev("document.querySelector('#personal-import-preview').textContent"),'2 new sources; 0 duplicate URLs will be skipped.');
+ assert.equal(await ev("document.querySelector('#personal-import-preview').textContent"),'0 directory favorites and 2 added sources to add; 0 duplicates skipped; 0 directory URLs unavailable.');
  await click('#personal-import-cancel');assert.equal(await stored(),null);
  await click('#personal-import-open');await choose(exported);await click('#personal-import-confirm');
  const restored=(await stored()).sources;assert.equal(restored.length,2);
@@ -45,7 +45,7 @@ try{
  const existing=(await stored()).sources;
  const incoming=[source(existing[0].id,'https://ONE.example',{name:'Do not overwrite',favorite:false}),source(existing[0].id,'https://three.example/',{name:'<img src=x onerror=alert(1)>',description:'<script>window.backupInjected=true</script>',favorite:true}),source('again','https://three.example/',{name:'Duplicate in file'})];
  await click('#personal-import-open');await choose(backup(incoming));
- assert.equal(await ev("document.querySelector('#personal-import-preview').textContent"),'1 new sources; 2 duplicate URLs will be skipped.');
+ assert.equal(await ev("document.querySelector('#personal-import-preview').textContent"),'0 directory favorites and 1 added sources to add; 2 duplicates skipped; 0 directory URLs unavailable.');
  await click('#personal-import-confirm');const merged=(await stored()).sources;
  assert.deepEqual(merged.slice(0,2),existing);assert.equal(merged.length,3);assert.equal(new Set(merged.map(s=>s.id)).size,3);
  assert.equal(merged[2].favorite,true);assert.equal(await ev('window.backupInjected===undefined'),true);
