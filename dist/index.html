@@ -429,7 +429,16 @@ summary:hover{background:var(--soft)}
 .collection-tools{min-width:0;max-width:100%}.collection-tools>summary{padding:10px 12px;border:1px solid var(--control-line);min-height:var(--control-height);box-sizing:border-box;font-size:var(--text-small)}.collection-tools[open]{flex-basis:100%}.collection-tool-actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:12px}.collection-tool-actions .collection-note{flex-basis:100%;margin:0;max-width:70ch}
 .directory-context{margin-bottom:var(--space-3);font-size:var(--text-small);color:var(--muted)}.directory-context>summary{min-height:var(--control-height);display:list-item;align-content:center;padding-block:8px;box-sizing:border-box}.directory-context .comparison-key{margin-top:12px}
 @media(max-width:639px){
- .hero{padding:24px 0;gap:16px}.hero .cover-line{display:none}.hero-actions{margin-top:16px}.cover-kicker{margin-top:12px;gap:6px 12px}.cover-image{display:grid;grid-template-columns:88px minmax(0,1fr);align-items:end;gap:12px}.cover-image img{width:88px;height:112px;object-fit:cover}.cover-image figcaption{padding:0}
+ .hero{container-type:inline-size;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);padding:24px 0;column-gap:16px;row-gap:0;align-items:start}
+ .cover-copy{display:contents}.cover-copy>.eyebrow{grid-column:1/-1;grid-row:1;margin-bottom:20px}
+ html .hero .cover-copy>h1{grid-column:1;grid-row:2;align-self:center;font-size:clamp(2rem,10vw,3.5rem);margin:0;overflow-wrap:anywhere}
+ .cover-visual{grid-column:2;grid-row:2}.cover-image{display:block}.cover-image img{width:100%;height:auto}.cover-image figcaption{padding-top:8px}
+ .hero .cover-line{display:none}.hero .cover-copy>p:not(.cover-line){grid-column:1/-1;margin:20px 0 0}
+ .hero-actions a{white-space:normal}.hero-actions{grid-column:1/-1;margin-top:16px}.cover-kicker{grid-column:1/-1;margin-top:12px;gap:6px 12px}
+ /* Stack the cover when enlarged text leaves too little room for two columns. */
+ @container(max-width:16rem){
+  html .hero .cover-copy>h1{grid-column:1/-1}.cover-visual{grid-column:1/-1;grid-row:3}.cover-image{max-width:192px;margin-top:16px}
+ }
  #directory{padding-top:24px}.section-top{margin-bottom:20px}.collection-controls{margin-top:8px;padding-top:8px}#my-sources{margin:16px 0;padding:16px 0}.is-empty>.personal-note,.is-empty>#personal-status{display:none}#my-sources.is-empty .personal-heading{margin-bottom:8px}
 }
 </style><meta name="apple-mobile-web-app-title" content="The Reference Edit"><script>if(/^https?:$/.test(location.protocol)){for(const [rel,href] of [["manifest","/manifest.webmanifest"],["apple-touch-icon","/icons/apple-touch-icon.png"]]){const link=document.createElement("link");link.rel=rel;link.href=href;document.head.append(link);}}</script></head><body><!-- Bundled Newsreader and Inter font licenses:
