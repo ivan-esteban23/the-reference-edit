@@ -1,3 +1,13 @@
+# Personal source backup and restore validation
+
+Added a compact “Backup and restore” disclosure in My sources. JSON export includes all personal records, metadata, image URLs and favorites, regardless of search/favorites filters. Import validates versioned backups up to 5 MB, previews counts and requires confirmation. It adds new canonical URLs while preserving existing records and favorites, skips duplicates and assigns fresh IDs. Confirmation rereads current storage to preserve other-tab changes. Invalid data is rejected before writes; failed writes preserve the collection and selected file for retry. All controls/messages support the six existing languages.
+
+`node tests/personal-backup.mjs`: PASS, eight check groups and 96 import-dialog layout/language/theme/text-size cases, including actual online/offline downloads, restoration into an empty collection, preview/cancel, duplicate URLs, colliding IDs, inert text, invalid/unsafe/oversized files, quota retry, other-tab changes and offline import. A deferred dialog-close race found during the rejection tests was fixed so a stale close event cannot invalidate a newly reopened import dialog. The final mobile import preview was visually inspected.
+
+Regressions passed: `node tests/site.mjs` (96 layouts, ten check groups); `node tests/personal-sources.mjs` (96 layouts, ten groups); and `node tests/service-worker.mjs` (twelve checks). All 58 curated records are byte-identical to their pre-feature state. Syntax checks and `git diff --check` pass. The worker key is `visual-edit-shell-backup-v1`; no static assets, dependencies or build step were added.
+
+Current evidence: `/tmp/reference-regression-results/personal-backup.json` and `/tmp/reference-backup-results/mobile-import.png`. Testing used Chromium, not Safari/physical devices. Backups transfer personal text records and image URLs manually; remote image files, curated favorites and automatic synchronization are outside this feature.
+
 # Accessibility and footer polish validation
 
 Personal edit/delete controls now include the localized action and source name in `aria-label`; visible button text stays compact. All six footer translations now describe the saved offline fonts/cover and logos cached on later online visits, replacing the outdated embedded-assets wording. The worker key is `visual-edit-shell-audit-v2` to refresh the updated HTML. All 58 curated records are unchanged.

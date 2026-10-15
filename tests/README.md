@@ -9,6 +9,7 @@ node tests/service-worker.mjs
 node tests/site.mjs
 node --test tests/worker-storage.mjs
 node tests/personal-sources.mjs
+node tests/personal-backup.mjs
 ```
 
 For a focused interaction/keyboard rerun, use `node tests/site.mjs --interactions-only`; that mode explicitly omits the layout matrix.
@@ -35,9 +36,15 @@ The source-record check permits only image URL substitutions against the histori
 
 Personal sources live in the “My sources” section, with their own search and favorites filter. They do not change the curated directory's filters, favorite count or Markdown export. Name, website URL and short description are required; category, country, tags and an HTTP(S) image URL are optional. External images are not stored for offline use. Text records work offline after the app shell is cached. The collection is local to the current browser/app, without account or cross-device sync.
 
+Open “Backup and restore” in My sources to export a JSON file or import it on another browser/device. Export includes every personal record, optional metadata and favorite state regardless of filters. External images are represented by their URLs, not bundled image files. Backups contain `{format:"the-reference-edit-personal-sources",version:1,exportedAt,sources:[...]}` and use the same record fields as local storage.
+
+Import accepts version 1 backups up to 5 MB, validates the whole file and shows a preview before confirmation. It adds only new canonical HTTP(S) URLs; existing records win, including their metadata and favorites. Duplicate URLs within a backup are skipped. New records get new local IDs, avoiding collisions across devices. Confirmation rereads the latest collection, so other-tab changes are preserved. Malformed/unsupported data or unsafe URLs cause no writes. Storage errors leave both the stored collection and selected backup intact for retry. Export/import work offline after the app shell is cached; they do not provide automatic cross-device sync or include curated favorites.
+
 Storage key `reference-edit-personal-sources-v1` contains `{version:1,sources:[...]}`, separately from curated favorites. Writes read the latest stored collection before changing one record. Invalid stored data is preserved and reported; a failed write preserves both stored data and the open form. User content renders through DOM text APIs, and source/image URLs accept only HTTP(S). Data entered by the user stays unchanged when the interface language changes.
 
 `personal-sources.mjs` runs ten functional check groups and 96 form layout/language/theme/text-size cases. It covers CRUD, URL validation, inert user text, optional metadata, duplicate detection, search/favorites, persistence, storage failure recovery, corrupt-data preservation, keyboard dismissal/focus and offline editing. It also verifies all 58 curated DOM records remain unchanged after personal-source operations. A current mobile capture goes to `/tmp/reference-personal-results/mobile.png`; JSON results use the normal results directory.
+
+`personal-backup.mjs` runs eight backup check groups and 96 import-dialog layout/language/theme/text-size cases. It tests real JSON downloads, restore into an empty collection, preview/cancel, non-destructive merges, URL/ID collisions, invalid/oversized files, quota-failure retry, other-tab changes and offline import/export. The current mobile capture is `/tmp/reference-backup-results/mobile-import.png`; JSON results use the normal results directory. Temporary imported files and download directories are removed after the run.
 
 ## Manual Safari checks (not automated)
 

@@ -422,6 +422,9 @@ summary:hover{background:var(--soft)}
 #personal-form input,#personal-form textarea,#personal-search{box-sizing:border-box;width:100%;min-width:0;max-width:100%;font:inherit;padding:10px;background:var(--page);color:var(--ink);border:1px solid var(--control-line);border-radius:var(--control-radius);min-height:var(--control-height)}
 #personal-form textarea{resize:vertical}#personal-dialog p:empty,#personal-delete-dialog p:empty{display:none}
 @media print{#personal-tools,#personal-add,.personal-actions,#personal-dialog,#personal-delete-dialog{display:none!important}}
+
+#personal-import-dialog{box-sizing:border-box;width:min(calc(100% - 2 * var(--gutter)),36rem);max-height:85dvh;overflow:auto;padding:var(--space-3);background:var(--surface);color:var(--ink);border:1px solid var(--control-line)}
+#personal-import-dialog::backdrop{background:#0008}#personal-import-dialog h2{font:400 var(--type-section)/1.2 var(--serif);overflow-wrap:anywhere}#personal-import-dialog label{display:block}#personal-import-file{box-sizing:border-box;display:block;max-width:100%;min-height:var(--control-height);font:inherit;margin-block:12px}#personal-import-dialog button{font:inherit;min-height:var(--control-height);padding:8px 14px;background:var(--surface);color:var(--ink);border:1px solid var(--control-line);overflow-wrap:anywhere}#personal-import-dialog p{overflow-wrap:anywhere}#personal-transfer-status{font-size:var(--text-small)}@media print{#personal-backup,#personal-import-dialog,#personal-transfer-status{display:none!important}}
 </style><meta name="apple-mobile-web-app-title" content="The Reference Edit"><script>if(/^https?:$/.test(location.protocol)){for(const [rel,href] of [["manifest","/manifest.webmanifest"],["apple-touch-icon","/icons/apple-touch-icon.png"]]){const link=document.createElement("link");link.rel=rel;link.href=href;document.head.append(link);}}</script></head><body><!-- Bundled Newsreader and Inter font licenses:
 Newsreader
 Copyright 2020 The Newsreader Project Authors (http://github.com/productiontype/Newsreader)
@@ -617,8 +620,11 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
  <div class="personal-heading"><h2 id="personal-title" data-personal-label="title">My sources</h2><button id="personal-add" type="button" aria-haspopup="dialog" aria-controls="personal-dialog" data-personal-label="add">Add source</button></div>
  <p class="personal-note" data-personal-label="intro">Your own references, stored in this browser. They stay separate from the curated directory.</p>
  <div id="personal-tools" hidden><label for="personal-search" data-personal-label="search">Search my sources</label><input id="personal-search" type="search" maxlength="300"><button id="personal-only" type="button" aria-pressed="false" data-personal-label="only">Favorites only</button></div>
+ <details id="personal-backup"><summary data-personal-label="backup">Backup and restore</summary><div class="personal-actions"><button id="personal-export" type="button" data-personal-label="export">Export backup (.json)</button><button id="personal-import-open" type="button" aria-haspopup="dialog" aria-controls="personal-import-dialog" data-personal-label="import">Import backup</button></div><p class="personal-note" data-personal-label="backupHint">Export all My sources, including favorites. Import adds new URLs and keeps existing sources unchanged.</p></details>
+ <p id="personal-transfer-status" role="status" aria-live="polite"></p>
  <p id="personal-status" role="status" aria-live="polite"></p><p id="personal-warning" role="status" hidden></p><div id="personal-list" class="personal-grid"></div>
 </section>
+<dialog id="personal-import-dialog" aria-labelledby="personal-import-title"><h2 id="personal-import-title" data-personal-label="import">Import backup</h2><label for="personal-import-file" data-personal-label="file">Choose a JSON backup (up to 5 MB)</label><input id="personal-import-file" type="file" accept=".json,application/json" aria-describedby="personal-import-hint"><p id="personal-import-hint" class="personal-note" data-personal-label="backupHint">Export all My sources, including favorites. Import adds new URLs and keeps existing sources unchanged.</p><p id="personal-import-preview" role="status"></p><p id="personal-import-error" role="alert"></p><div class="personal-actions"><button id="personal-import-cancel" type="button" data-personal-label="cancel">Cancel</button><button id="personal-import-confirm" type="button" disabled data-personal-label="import">Import backup</button></div></dialog>
 <dialog id="personal-dialog" aria-labelledby="personal-dialog-title">
  <form id="personal-form"><h2 id="personal-dialog-title" data-personal-label="add">Add source</h2>
  <label for="personal-name" data-personal-label="name">Name</label><input id="personal-name" name="name" required maxlength="120" autocomplete="off">
@@ -673,7 +679,7 @@ document.querySelectorAll('.copy-source').forEach(b=>b.addEventListener('click',
 document.querySelectorAll('.print-guide').forEach(b=>b.addEventListener('click',()=>window.print()));
 const langSelect=document.querySelector('#language'),originalTexts=new WeakMap(),originalAttributes=new WeakMap();const preservedNames=new Set(cards.map(c=>c.querySelector('h3 a').textContent.trim()));
 document.querySelectorAll('#region option').forEach(o=>o.value=o.textContent);
-function translateDOM(){const walker=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT);while(walker.nextNode()){const node=walker.currentNode,p=node.parentElement;if(!p||p.closest('#my-sources,#personal-dialog,#personal-delete-dialog,script,style,#app-dialog,[data-app-open],#language,#filter-chips,h3 a,.footer-wordmark,.masthead>span,.footer-colophon a'))continue;const original=originalTexts.has(node)?originalTexts.get(node):node.nodeValue;originalTexts.set(node,original);const trimmed=original.trim();if(preservedNames.has(trimmed))continue;node.nodeValue=original.replace(trimmed,t(trimmed));}document.querySelectorAll('[placeholder],[title],[aria-label],[alt],[label]').forEach(el=>{let attrs=originalAttributes.get(el);if(!attrs){attrs={};['placeholder','title','aria-label','alt','label'].forEach(a=>{if(el.hasAttribute(a))attrs[a]=el.getAttribute(a);});originalAttributes.set(el,attrs);}Object.entries(attrs).forEach(([a,text])=>el.setAttribute(a,t(text)));});document.title=t('The Reference Edit — Visual Research and Moodboarding');}
+function translateDOM(){const walker=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT);while(walker.nextNode()){const node=walker.currentNode,p=node.parentElement;if(!p||p.closest('#my-sources,#personal-import-dialog,#personal-dialog,#personal-delete-dialog,script,style,#app-dialog,[data-app-open],#language,#filter-chips,h3 a,.footer-wordmark,.masthead>span,.footer-colophon a'))continue;const original=originalTexts.has(node)?originalTexts.get(node):node.nodeValue;originalTexts.set(node,original);const trimmed=original.trim();if(preservedNames.has(trimmed))continue;node.nodeValue=original.replace(trimmed,t(trimmed));}document.querySelectorAll('[placeholder],[title],[aria-label],[alt],[label]').forEach(el=>{let attrs=originalAttributes.get(el);if(!attrs){attrs={};['placeholder','title','aria-label','alt','label'].forEach(a=>{if(el.hasAttribute(a))attrs[a]=el.getAttribute(a);});originalAttributes.set(el,attrs);}Object.entries(attrs).forEach(([a,text])=>el.setAttribute(a,t(text)));});document.title=t('The Reference Edit — Visual Research and Moodboarding');}
 function refreshAsiaBrowse(){document.querySelectorAll('[data-browse-country],[data-browse-region]').forEach(button=>{const country=button.dataset.browseCountry;const market=country||button.dataset.browseRegion;const n=cards.filter(c=>country?c.dataset.country===country:c.dataset.region===market).length;button.setAttribute('aria-label',t(country?'Browse {country}: {n} sources':'Explore {country} coverage: {n} sources').replace('{country}',t(market)).replace('{n}',n));button.setAttribute('aria-pressed',String(country?countryFilter.value===country:region.value===market));const count=button.querySelector('[data-country-count]');if(count)count.textContent=t(n===1?'{n} source':'{n} sources').replace('{n}',n);});}
 function refreshDynamicLabels(){window.dispatchEvent(new Event("visual-edit:languagechange"));renderFilterChips();refreshAsiaBrowse();const n=cards.filter(c=>!c.hidden).length;document.querySelector('#count').textContent=t('{n} of {total} sources').replace('{n}',n).replace('{total}',cards.length);const active=activeFilterCount();document.querySelector('#active-filters').textContent=active?t('{n} active').replace('{n}',active):t('All sources');buttons.forEach(b=>{const count=b.querySelector('.filter-count').textContent;b.setAttribute('aria-label',t(b.dataset.filter==='All'?'All sources':b.dataset.filter)+': '+count);});document.querySelectorAll('.copy-source').forEach(b=>{const name=b.closest('.source').querySelector('h3 a').textContent.trim().replace('↗','').trim();b.setAttribute('aria-label',t('Copy source link for {name}').replace('{name}',name));});}
 function setLocale(locale,persist=true){activeLocale=locale==='en'||translations[locale]?locale:'en';document.documentElement.lang=activeLocale;langSelect.value=activeLocale;translateDOM();update();if(persist){try{localStorage.setItem('visual-edit-language',activeLocale);}catch(e){}const url=new URL(location.href);if(activeLocale==='en')url.searchParams.delete('lang');else url.searchParams.set('lang',activeLocale);try{history.replaceState(null,'',url.href);}catch(e){}}}
@@ -779,6 +785,7 @@ document.querySelector('#export-favorites').addEventListener('click',()=>{if(!fa
   const visible=sources.filter(s=>(!only||s.favorite)&&[s.name,s.url,s.description,s.category,s.country,s.tags].join(' ').toLocaleLowerCase().includes(q));
   $('personal-tools').hidden=!sources.length;$('personal-only').setAttribute('aria-pressed',String(only));
   $('personal-status').textContent=sources.length?`${visible.length} / ${sources.length} ${label('shown')}`:label('empty');
+  $('personal-export').disabled=!sources.length;
   list.replaceChildren();
   if(sources.length&&!visible.length)list.append(element('p',label('noMatches')));
   for(const source of visible){
@@ -834,6 +841,70 @@ document.querySelector('#export-favorites').addEventListener('click',()=>{if(!fa
  });
  function reload(){try{sources=read();warning.hidden=true;}catch(error){notice('corrupt');}localize();}
  window.addEventListener('storage',event=>{if(event.key===key||event.key===null)reload();});
+ const backupWords={
+  en:['Backup and restore','Export backup (.json)','Import backup','Choose a JSON backup (up to 5 MB)','Export all My sources, including favorites. Import adds new URLs and keeps existing sources unchanged.','{added} new sources; {skipped} duplicate URLs will be skipped.','Imported {added} sources; skipped {skipped} duplicate URLs.','Choose a valid My sources JSON backup (version 1, up to 5 MB). Nothing was imported.'],
+  es:['Copia y restauración','Exportar copia (.json)','Importar copia','Elige una copia JSON (hasta 5 MB)','Exporta todas Mis fuentes, incluidas las favoritas. La importación añade URL nuevas y conserva las fuentes existentes.','{added} fuentes nuevas; se omitirán {skipped} URL duplicadas.','Se importaron {added} fuentes y se omitieron {skipped} URL duplicadas.','Elige una copia JSON válida de Mis fuentes (versión 1, hasta 5 MB). No se importó nada.'],
+  'zh-Hans':['备份与恢复','导出备份 (.json)','导入备份','选择 JSON 备份（最大 5 MB）','导出所有个人来源及收藏。导入仅添加新网址，保留现有来源。','将添加 {added} 个来源，跳过 {skipped} 个重复网址。','已导入 {added} 个来源，跳过 {skipped} 个重复网址。','请选择有效的个人来源 JSON 备份（版本 1，最大 5 MB）。未导入任何内容。'],
+  'zh-Hant':['備份與還原','匯出備份 (.json)','匯入備份','選擇 JSON 備份（最大 5 MB）','匯出所有個人來源及收藏。匯入僅新增網址，保留現有來源。','將新增 {added} 個來源，略過 {skipped} 個重複網址。','已匯入 {added} 個來源，略過 {skipped} 個重複網址。','請選擇有效的個人來源 JSON 備份（版本 1，最大 5 MB）。未匯入任何內容。'],
+  ja:['バックアップと復元','バックアップを書き出す (.json)','バックアップを読み込む','JSON バックアップを選択（最大 5 MB）','お気に入りを含むすべての情報源を書き出します。読み込み時は新しいURLのみ追加し、既存の情報源は変更しません。','新規 {added} 件、重複URL {skipped} 件はスキップされます。','{added} 件を読み込み、重複URL {skipped} 件をスキップしました。','有効な情報源のJSONバックアップを選択してください（バージョン1、最大5 MB）。何も読み込まれていません。'],
+  ko:['백업 및 복원','백업 내보내기 (.json)','백업 가져오기','JSON 백업 선택 (최대 5 MB)','즐겨찾기를 포함한 모든 내 소스를 내보냅니다. 가져오기는 새 URL만 추가하며 기존 소스는 유지합니다.','새 소스 {added}개를 추가하고 중복 URL {skipped}개를 건너뜁니다.','소스 {added}개를 가져왔으며 중복 URL {skipped}개를 건너뛰었습니다.','유효한 내 소스 JSON 백업을 선택하세요 (버전 1, 최대 5 MB). 아무것도 가져오지 않았습니다.']
+ };
+ const backupNames=['backup','export','import','file','backupHint','preview','imported','invalidBackup'];
+ for(const locale of Object.keys(words))words[locale].push(...backupWords[locale]);names.push(...backupNames);
+ const importDialog=$('personal-import-dialog'),fileInput=$('personal-import-file'),importConfirm=$('personal-import-confirm');
+ let pendingImport=null,fileSelection=0,lastImport=null;
+ const formatCounts=(message,counts)=>label(message).replace('{added}',counts.added).replace('{skipped}',counts.skipped);
+ function mergeBackup(latest,incoming){
+  const urls=new Set(latest.map(s=>webURL(s.url))),next=[...latest];let skipped=0;
+  for(const source of incoming){
+   if(urls.has(source.url)){skipped++;continue;}
+   urls.add(source.url);next.push({...source,id:crypto.randomUUID()});
+  }
+  return {next,added:next.length-latest.length,skipped};
+ }
+ function previewImport(){
+  if(!pendingImport)return;
+  try{$('personal-import-preview').textContent=formatCounts('preview',mergeBackup(read(),pendingImport));}
+  catch(error){$('personal-import-error').textContent=label('failure');importConfirm.disabled=true;}
+ }
+ $('personal-export').addEventListener('click',()=>{
+  try{
+   const data={format:'the-reference-edit-personal-sources',version:1,exportedAt:new Date().toISOString(),sources:read()};
+   const blob=new Blob([JSON.stringify(data,null,2)+'\n'],{type:'application/json'}),url=URL.createObjectURL(blob),a=element('a');
+   a.href=url;a.download='The Reference Edit - My sources.json';document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
+  }catch(error){notice('corrupt');}
+ });
+ $('personal-import-open').addEventListener('click',()=>{
+  fileSelection++;pendingImport=null;fileInput.value='';importConfirm.disabled=true;
+  $('personal-import-error').textContent='';$('personal-import-preview').textContent='';importDialog.showModal();fileInput.focus();
+ });
+ fileInput.addEventListener('change',async()=>{
+  const selection=++fileSelection,file=fileInput.files[0];pendingImport=null;importConfirm.disabled=true;
+  $('personal-import-error').textContent='';$('personal-import-preview').textContent='';
+  if(!file)return;
+  try{
+   if(file.size>5*1024*1024)throw Error('Size');const data=JSON.parse(await file.text());
+   if(selection!==fileSelection)return;
+   if(data?.format!=='the-reference-edit-personal-sources'||data.version!==1||!Array.isArray(data.sources)||!data.sources.every(valid))throw Error('Backup');
+   const incoming=data.sources.map(source=>{
+    const clean={id:source.id,favorite:source.favorite};for(const name of Object.keys(fields))clean[name]=source[name];
+    clean.url=webURL(clean.url);if(clean.image)clean.image=webURL(clean.image);if(!valid(clean))throw Error('Backup');return clean;
+   });
+   pendingImport=incoming;importConfirm.disabled=false;previewImport();
+  }catch(error){if(selection===fileSelection)$('personal-import-error').textContent=label('invalidBackup');}
+ });
+ $('personal-import-cancel').addEventListener('click',()=>importDialog.close());
+ importDialog.addEventListener('close',()=>{if(importDialog.open)return;fileSelection++;pendingImport=null;$('personal-import-open').focus({preventScroll:true});});
+ importConfirm.addEventListener('click',()=>{
+  if(!pendingImport)return;let counts;
+  if(commit(latest=>{counts=mergeBackup(latest,pendingImport);return counts.next;})){
+   only=false;$('personal-search').value='';render();lastImport=counts;importDialog.close();$('personal-transfer-status').textContent=formatCounts('imported',counts);
+  }else $('personal-import-error').textContent=warning.textContent;
+ });
+ window.addEventListener('visual-edit:languagechange',()=>{
+  previewImport();if(lastImport)$('personal-transfer-status').textContent=formatCounts('imported',lastImport);
+ });
+
  window.addEventListener('visual-edit:languagechange',localize);reload();
 })();
 
