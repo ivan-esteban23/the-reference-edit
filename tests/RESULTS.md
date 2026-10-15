@@ -1,3 +1,11 @@
+# Unified collection validation
+
+“Collection” on mobile and “My collection” in the desktop header now open one destination containing saved directory entries and every personal source. “All,” “From directory” and “Added by me” filters share a search field; directory filters retain their own state. The combined badge includes both kinds. Personal CRUD and favorites remain available; directory cards can be removed or opened in the full directory. All six languages have translated controls, origins and empty states. Browser Back/reload restore the collection route without leaking collection searches into URLs.
+
+Existing favorites and personal-source storage formats are retained without a migration. Storage notifications refresh the view. Directory favorite mutations read the latest stored selection and preserve existing data on quota or malformed-data failures. Export and restore clearly separates directory Markdown exports from version 1 personal JSON backups. A single combined restorable backup remains a future feature.
+
+Passed: collection (seven functional groups, 96 layouts), site (eleven groups, 96 layouts), personal CRUD (ten groups, 96 form layouts), personal backups (eight groups, 96 dialog layouts), worker migration/navigation (twelve groups), injected worker storage failures (ten tests), and Pages preparation (four groups, including the combined collection on prefixed offline routes). Collection tests found and verified fixes for Back navigation and enlarged-text header layout; existing backup checks also verified restored dialog focus. All 58 curated records and original image/font bytes are preserved. Worker key: `visual-edit-shell-collection-v1`. Mobile/desktop manifest captures are refreshed. Physical-phone/Safari review and publication are pending merge.
+
 # Mobile editorial cover validation
 
 Replaced the small mobile thumbnail with a full-proportion portrait beside the headline. The introduction, directory actions and research labels follow below; the image credit stays directly below the portrait. At 390×844 the portrait is about 149×189px (previously 88×112px), with search at 875px and the first curated card at 1,423px. Enlarged text switches to a stacked cover when there is insufficient room for two columns; mobile action labels wrap. Desktop layout and all 58 curated records remain unchanged.
