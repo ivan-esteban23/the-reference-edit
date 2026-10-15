@@ -1,3 +1,11 @@
+# Simpler research guides validation
+
+Consolidated four overlapping guide sections into one Research guides destination immediately after the directory. Three short choices—Find inspiration, Research a topic and Build a moodboard—open to three steps with relevant source links. Vintage identification, source-language searching and photo-shoot examples remain inside the appropriate paths. One expandable reference template retains credit/date/context fields and image-use guidance. Removed obsolete list-change/report notes and repeated navigation entries; editor selections, regional recommendations and all 58 source records remain intact.
+
+New visible copy is translated in all six languages; reused steps retain their existing translations. Historic `#workflow`, `#landscape` and `#notes` fragments reveal the matching disclosure. Browser Back restores the guide before applying language updates so stale directory filters cannot replace its URL. Research guides is first in both section menus. Printing expands guides and the reference template, then restores their prior states. Narrow/enlarged-text layouts simplify the summary grid to avoid CJK heading overflow.
+
+Passed locally: site (96 expanded layouts, twelve functional groups, including legacy fragments and native guide keyboard controls), Pages preparation (four groups, including offline guide navigation), and worker migration/navigation (twelve groups). All original image/font bytes and curated records are preserved. Mobile/desktop guide captures were inspected. Worker key: `visual-edit-shell-research-guides-v1`. Safari/physical-device review and publication remain pending.
+
 # Complete collection backup validation
 
 One versioned JSON export now includes directory favorites and all added sources with their metadata and personal favorite flags, independent of collection filters. Directory-only collections can export. Import accepts complete backups and older personal-source version 1 files. It previews new items, duplicates and unavailable directory URLs, then merges against the latest stored data on confirmation. Existing personal records win, new IDs avoid collisions and unknown catalog URLs are reported/skipped. All six languages have updated controls and count messages.
