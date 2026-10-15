@@ -83,6 +83,7 @@ try{
   await ev(`document.documentElement.style.fontSize='${size}%';document.documentElement.dataset.theme=${JSON.stringify(theme)}`);
   for(const locale of ['en','es','zh-Hans','zh-Hant','ja','ko']){
    await ev(`(()=>{const e=document.querySelector('#language');e.value=${JSON.stringify(locale)};e.dispatchEvent(new Event('change'));})()`);
+   assert.ok(await ev("[...document.querySelectorAll('.personal-source')].every(c=>[...c.querySelectorAll('[data-personal-action=edit],[data-personal-action=delete]')].every(b=>b.getAttribute('aria-label')===b.textContent+': '+c.querySelector('h3 a').textContent))"), 'Personal action names lack localized action/source context');
    await click('#personal-add');await ev("document.querySelector('#personal-form details').open=true");await pause(20);
    const layout=await ev(`(()=>{const d=document.querySelector('#personal-dialog'),r=d.getBoundingClientRect();return {lang:document.documentElement.lang,overflow:document.documentElement.scrollWidth>innerWidth+1||d.scrollWidth>d.clientWidth+1,outside:r.left<0||r.right>innerWidth+1,unlabeled:[...d.querySelectorAll('input,textarea')].some(e=>!e.labels.length)}})()`);
    assert.equal(layout.lang,locale);assert.equal(layout.overflow,false);assert.equal(layout.outside,false);assert.equal(layout.unlabeled,false);

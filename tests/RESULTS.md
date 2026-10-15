@@ -1,3 +1,9 @@
+# Accessibility and footer polish validation
+
+Personal edit/delete controls now include the localized action and source name in `aria-label`; visible button text stays compact. All six footer translations now describe the saved offline fonts/cover and logos cached on later online visits, replacing the outdated embedded-assets wording. The worker key is `visual-edit-shell-audit-v2` to refresh the updated HTML. All 58 curated records are unchanged.
+
+Passed: `node tests/personal-sources.mjs` (ten functional groups, 96 layout/language/theme/text-size cases, including contextual edit/delete labels); `node tests/site.mjs --interactions-only` (ten check groups, with the layout matrix intentionally omitted); `node tests/service-worker.mjs` (twelve checks); six-language footer readback in Chromium; and `git diff --check`. The earlier full layout results remain recorded below.
+
 # Focused audit validation
 
 Implemented the top two low-risk patches from `tests/AUDIT.md`: externalized both embedded fonts without changing their bytes, and aligned manifest, Apple install and localized browser titles with “The Reference Edit.” The manifest short name is “Reference.” The fonts remain in the required offline shell; the worker cache key is `visual-edit-shell-audit-v1`.
