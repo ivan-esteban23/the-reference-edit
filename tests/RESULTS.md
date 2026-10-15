@@ -1,3 +1,62 @@
+# Focused audit validation
+
+Implemented the top two low-risk patches from `tests/AUDIT.md`: externalized both embedded fonts without changing their bytes, and aligned manifest, Apple install and localized browser titles with “The Reference Edit.” The manifest short name is “Reference.” The fonts remain in the required offline shell; the worker cache key is `visual-edit-shell-audit-v1`.
+
+HTML decreased from 2,330,812 to 559,799 bytes (76.0%). Required-shell size decreased from 2,708,215 to 2,265,443 bytes (16.3%). These are uncompressed file sizes. Fonts, typography, all 58 curated article records, screenshots, icons and manifest fields outside naming are preserved.
+
+Passed: both full Chromium layout matrices (192 cases total), ten UI check groups, ten personal-source functional groups, twelve worker/migration/offline groups, and all ten injected storage-failure tests. Both extracted fonts match the historical bytes and load in online/offline navigation tests. Chromium manifest parsing, install names, screenshot URLs and font MIME types passed; all six final browser titles were checked after their label update. `git diff --check` passed.
+
+Safari/Firefox, physical-device installation and deployment remain untested. The audit records the prioritized remaining accessibility/context and explanatory-copy follow-ups; only the top two patches were implemented.
+
+# Personal source collection validation
+
+Added “My sources” before the curated cards, with add/edit/confirmed-delete, its own search and favorites filter, and optional category, country, tags and image URL. Name, HTTP(S) website URL and description are required. Interface labels support all six existing languages; user content is preserved. The collection uses `reference-edit-personal-sources-v1` separately from curated favorites. There is no backend, dependency or build step.
+
+User content renders as text, URLs accept only HTTP(S), and external images use no-referrer requests and are not saved for offline use. Duplicate personal URLs are rejected. A failed write keeps stored data and the open form intact. Unreadable existing data is reported without overwriting it. Deletion has a cancelable confirmation and focus restoration; Escape closes the editor.
+
+All 58 curated article records are byte-identical to the pre-feature state, including the image URLs introduced earlier. Personal favorites/search operate independently of curated favorites/search and Markdown export. Personal text records remain available and editable offline once the app shell is cached. The worker cache key is now `visual-edit-shell-personal-sources-v1` so existing installs receive the updated HTML; no new shell assets were added.
+
+- `node tests/personal-sources.mjs`: PASS, ten functional check groups and 96 form layout/language/theme/text-size combinations. Covers CRUD, required fields and safe URLs, inert text, metadata search, duplicates, personal favorites, reload persistence, quota errors, corrupt storage, real Escape handling, offline creation and unchanged curated records. The final mobile capture was visually inspected after widening the personal search input.
+- `node tests/site.mjs`: PASS, all 96 existing layout cases and nine check groups.
+- `node tests/service-worker.mjs`: PASS, all 12 migration/offline/navigation check groups.
+- `node --test tests/worker-storage.mjs`: PASS, all ten storage-failure tests.
+- `git diff --check`: PASS.
+
+Current JSON evidence is in `/tmp/reference-regression-results/`; the mobile capture is `/tmp/reference-personal-results/mobile.png`. Validation used Chromium. Safari, physical-device use and production deployment were not tested. Personal records remain local to the browser/app; they do not sync across devices or appear in the curated favorites export.
+
+# Storage resilience validation — 14 October 2026
+
+The worker cache version is now `visual-edit-shell-external-images-v3`. Runtime Cache Storage open/read/write failures no longer prevent a successful network response from reaching the page or its assets. A navigation cache-write failure returns the fresh HTML instead of falling back to a stale document. Failed storage reads during offline navigation return the existing reconnect response when no usable shell can be retrieved. Offline-status messages return `ready: false` on storage errors. Failed obsolete-cache cleanup does not block client claiming; explicit update messages retain their worker lifetime with `waitUntil`.
+
+Installation remains strict: failed shell downloads or writes cannot activate an incomplete replacement. Opaque responses remain excluded from image caching; redirected navigation responses are still reconstructed, and the four-second deadline still covers reading the complete body. No application HTML, source records, image files or manifest fields changed during this step.
+
+- `node --test tests/worker-storage.mjs`: PASS, ten tests with injected storage/quota/read errors, opaque responses, offline fallback and event lifetime checks against the actual worker source.
+- `node tests/service-worker.mjs`: PASS, all 12 browser check groups, including historical migration, redirected navigation, delayed headers/body, image caching and offline recovery.
+- `node tests/site.mjs`: PASS, all 96 layout cases and nine check groups, including image-byte parity and exact source-record preservation except the earlier image URL substitutions.
+- Worker/test syntax checks and `git diff --check`: PASS.
+
+These tests use Node failure injection and Chromium; they do not establish Safari compatibility or reproduce real Safari quota eviction. A macOS/iOS Safari and Home Screen manual checklist is in `tests/README.md`. No production deployment or physical-device test was performed.
+
+# Install screenshot validation — 14 October 2026
+
+Added real Chromium captures under `dist/screenshots/`: mobile directory (390×844 PNG, 46,238 bytes) and desktop home page (1440×900 PNG, 234,658 bytes). Both were visually inspected and declared in the manifest with `sizes`, `type`, `form_factor` and descriptive labels. All existing manifest fields are unchanged.
+
+Chromium's `Page.getAppManifest` parsed the updated manifest without errors. Both screenshot URLs returned HTTP 200 with `image/png`, decoded successfully, and matched their declared dimensions and PNG headers. The application HTML is byte-identical to the state after image extraction. The only worker change is its cache version, now `visual-edit-shell-external-images-v2`, to refresh the cached manifest; screenshots are not added to the offline shell.
+
+`node tests/service-worker.mjs`: PASS, all 12 check groups. `git diff --check`: PASS. The earlier 96-case UI run remains recorded below; it was not repeated for this manifest-only feature. Android's actual install dialog and physical-device installation were not tested.
+
+# Image extraction validation — 14 October 2026
+
+Extracted all 60 embedded images into SHA-256-addressed files under `dist/images/`, preserving the original binary bytes. HTML shrank from 3,424,048 to 2,311,542 bytes (32.5%). HTML plus external image files totals 3,146,300 bytes; these are uncompressed file sizes, not measured transfer times. Embedded fonts remain unchanged. No dependencies or build step were added.
+
+The worker cache version is `visual-edit-shell-external-images-v1`. The cover and favicon join the existing seven shell assets; the 58 source logos cache on demand during controlled online visits. A logo that has not been cached needs an online revisit. Failed image downloads are not cached; cache-write failures do not discard a successful image response.
+
+- `node tests/site.mjs`: PASS, 96 layout cases and nine check groups. All 60 extracted image files match the historical image bytes; restoring their original data URLs makes all 58 article records byte-identical. Every page image decodes; the existing interaction, persistence, keyboard, print and accessible-name checks pass.
+- `node tests/service-worker.mjs`: PASS, 12 check groups. Failed installation recovery, historical-worker upgrade, first offline cover, on-demand logo caching, failed image download/retry, online/error/slow-header/slow-body/offline reloads, redirects, preference preservation and unrelated-cache preservation pass. All page images decode during navigation scenarios after logos have been cached.
+- Current JSON results: `/tmp/reference-regression-results/site.json` and `/tmp/reference-regression-results/service-worker.json`. Validation uses Chromium on local HTTP, not Safari/Firefox, production deployment or physical-device installation. Cache-write/quota failure handling is defensive code, not a simulated quota test.
+
+The earlier bug-fix report below describes the previous implementation and its historical test runs.
+
 # Local bug-fix validation — 14 October 2026
 
 Inspected clean local `main` at `746988f5781dced727f59a37dcd0f61bdf349db6`, recent history, tracked project files, ancestor instructions and Sites' local-only workflow. There is no package manifest, generated source tree or build command: `dist/` is the maintained buildless source. No pre-existing uncommitted changes were present. This task did not commit, push, deploy, open a PR or update the vault.

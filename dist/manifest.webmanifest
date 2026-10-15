@@ -1,7 +1,7 @@
 {
   "id": "/",
-  "name": "The Visual Edit",
-  "short_name": "Visual Edit",
+  "name": "The Reference Edit",
+  "short_name": "Reference",
   "description": "An editorial directory for visual research and moodboarding.",
   "lang": "en",
   "start_url": "/",
@@ -27,6 +27,22 @@
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/screenshots/mobile-directory.png",
+      "sizes": "390x844",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Search, filter and browse visual research sources on mobile"
+    },
+    {
+      "src": "/screenshots/desktop-home.png",
+      "sizes": "1440x900",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "The Reference Edit home page on desktop"
     }
   ],
   "shortcuts": [

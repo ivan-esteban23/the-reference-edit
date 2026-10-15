@@ -1,17 +1,41 @@
 import assert from 'node:assert/strict';
 import vm from 'node:vm';
+import {createHash} from 'node:crypto';
 import {assets, baseline, browser, gitFile, pause, report, serve} from './browser.mjs';
 
 const files = await assets(), html = files.get('/index.html').toString();
 const before = gitFile(baseline, 'dist/index.html').toString();
 const records = source => [...source.matchAll(/<article\b[^>]*class="source"[\s\S]*?<\/article>/g)].map(m => m[0]);
-assert.equal(records(html).length, 58); assert.deepEqual(records(html), records(before), 'Source records changed');
+// Image URLs are the only permitted source-record change: verify every original byte first.
+const embedded = [...before.matchAll(/data:image\/([^;]+);base64,([A-Za-z0-9+/=]+)/g)];
+const extracted = [...html.matchAll(/images\/image-[a-f0-9]{16}\.(?:png|jpg|gif|ico|svg)/g)];
+assert.equal(embedded.length, 60); assert.equal(extracted.length, embedded.length);
+assert.ok(!html.includes('data:image/'), 'An image remains embedded');
+const extensions = {'svg+xml':'svg',jpeg:'jpg',png:'png','x-icon':'ico',gif:'gif'};
+let restored = html;
+for (let i = 0; i < embedded.length; i++) {
+  const original = Buffer.from(embedded[i][2], 'base64'), url = extracted[i][0];
+  assert.equal(url, `images/image-${createHash('sha256').update(original).digest('hex').slice(0,16)}.${extensions[embedded[i][1]]}`);
+  assert.deepEqual(files.get('/' + url), original, `Image bytes changed: ${url}`);
+  restored = restored.replace(url, embedded[i][0]);
+}
+assert.equal(files.size - [...files.keys()].filter(key=>!key.startsWith('/images/')).length, new Set(extracted.map(m=>m[0])).size, 'Unreferenced extracted images');
+assert.equal(records(html).length, 58); assert.deepEqual(records(restored), records(before), 'Source records changed beyond image URLs');
+const embeddedFonts = [...before.matchAll(/data:font\/ttf;base64,([A-Za-z0-9+/=]+)/g)];
+const fontPaths = [...html.matchAll(/fonts\/font-[a-f0-9]{16}\.ttf/g)].map(m=>m[0]);
+assert.equal(embeddedFonts.length,2); assert.equal(fontPaths.length,embeddedFonts.length);
+assert.ok(!html.includes('data:font/'), 'A font remains embedded');
+for(let i=0;i<embeddedFonts.length;i++) {
+  const original=Buffer.from(embeddedFonts[i][1],'base64');
+  assert.equal(fontPaths[i],`fonts/font-${createHash('sha256').update(original).digest('hex').slice(0,16)}.ttf`);
+  assert.deepEqual(files.get('/'+fontPaths[i]),original,'Font bytes changed');
+}
 let scripts = 0;
 for (const match of html.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script>/gi)) {
   if (/application\//.test(match[1])) continue;
   new vm.Script(match[2]); scripts++;
 }
-const result = {sourceRecords: 58, recordsByteIdentical: true, scriptsCompiled: scripts, layouts: [], checks: []};
+const result = {sourceRecords: 58, recordsByteIdenticalExceptImageURLs: true, imagesByteIdentical: embedded.length, fontsByteIdentical: embeddedFonts.length, scriptsCompiled: scripts, layouts: [], checks: []};
 const page = await browser((req, res) => serve(files, req, res));
 const {evaluate: ev, call, navigate} = page;
 const check = name => {result.checks.push(name); console.log(name);};
@@ -26,6 +50,10 @@ const key = async (key, code = key) => {
 };
 try {
   await navigate();
+  assert.ok(await ev("Promise.all([...document.images].map(i=>i.decode())).then(()=>[...document.images].every(i=>i.naturalWidth>0))"), 'Extracted images did not render');
+  check('All 60 extracted images retain their bytes and all page images decode');
+  assert.ok(await ev("document.fonts.size===2&&[...document.fonts].every(f=>f.status==='loaded')"), 'External fonts failed to load');
+  check('Both extracted fonts retain their original bytes and load successfully');
   // Exercise disclosures while measuring; a collapsed page can hide overflow bugs.
   await ev("document.querySelectorAll('details').forEach(d=>d.open=true)");
   const widths=process.argv.includes('--interactions-only')?[]:[320,390,768,1440];
