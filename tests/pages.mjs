@@ -52,12 +52,22 @@ try{
  assert.ok(await page.evaluate("document.fonts.size===2&&[...document.fonts].every(f=>f.status==='loaded')"));
  assert.deepEqual((await page.call('Page.getInstallabilityErrors')).installabilityErrors,[]);
  check('Project-path manifest, worker scope, images, fonts and installability work');
+ await page.until("document.querySelectorAll('.editorial-card img').length===3");
+ const gallery=await page.evaluate("Promise.all([...document.querySelectorAll('.editorial-card img')].map(async image=>{await image.decode();return {path:new URL(image.src).pathname,width:image.naturalWidth,height:image.naturalHeight};}))");
+ assert.ok(gallery.every(image=>image.path.startsWith(base+'images/references/')&&image.width===1024&&image.height===1280));
+ assert.deepEqual(files.get('/data/references.json'),original.get('/data/references.json'),'Catalog should retain canonical root image paths');
+ check('Gallery resolves canonical JSON image paths under the Pages application prefix');
+
  await page.evaluate("document.querySelector('.favorite-source').click();document.querySelector('#personal-add').click();const f=document.querySelector('#personal-form');f.elements.name.value='Pages reference';f.elements.url.value='https://example.com/pages';f.elements.description.value='Project-path persistence';f.requestSubmit();");
  await page.evaluate("document.querySelector('[data-collection-action=note]').click();document.querySelector('#directory-note-input').value='Project-path note';document.querySelector('#directory-note-form').requestSubmit()");
  const saved=await page.evaluate('({...localStorage})');
  await page.evaluate("navigateDirectory(false);document.querySelector('[data-topic=typography]').click()");
  offline=true;await page.call('Network.emulateNetworkConditions',{offline:true,latency:0,downloadThroughput:-1,uploadThroughput:-1});await page.navigate(base,true);
  assert.deepEqual(await page.evaluate('({...localStorage})'),saved);
+ await page.until("document.querySelectorAll('.editorial-card img').length===3");
+ assert.ok(await page.evaluate("Promise.all([...document.querySelectorAll('.editorial-card img')].map(image=>image.decode())).then(()=>true)"));
+ assert.ok(await page.evaluate("[...document.querySelectorAll('.editorial-card img')].every(image=>new URL(image.src).pathname.startsWith('/the-reference-edit/images/references/'))"));
+
  assert.equal(await page.evaluate('topic'),'typography');
  assert.equal(await page.evaluate("cards.filter(c=>!c.hidden).length"),4);
  await page.evaluate("document.querySelector('[data-topic=photography]').click()");
@@ -74,8 +84,12 @@ try{
  await page.evaluate("location.hash='#workflow'");await page.until("document.querySelector('#workflow').open&&!collectionOpen");
  await page.evaluate("location.hash='#source-chooser'");await page.until("document.querySelector('#source-chooser').open");
  await page.evaluate("document.querySelector('[data-chooser-goal=history]').click()");assert.equal(await page.evaluate("document.querySelectorAll('.chooser-card').length"),3);
+ await page.evaluate("location.hash='#editorial-gallery'");await page.until("!collectionOpen&&document.querySelector('#editorial-gallery').getClientRects().length>0");
+ assert.ok(await page.evaluate("Promise.all([...document.querySelectorAll('.editorial-card img')].map(image=>image.decode())).then(()=>true)"));
+ await page.evaluate("document.querySelector('#editorial-gallery a[href=\"#directory\"]').click()");await page.until("location.hash==='#directory'&&!collectionOpen");
  assert.deepEqual(page.exceptions,[]);
  check('Published paths preserve favorites and personal records during offline reload and index navigation');
+ check('Offline gallery navigation and its return to directory work under the Pages prefix');
  result.passed=true;
 }catch(error){result.error=error.stack;process.exitCode=1;}
 finally{if(page)await page.close();await rm(temporary,{recursive:true,force:true});await report('pages',result);}

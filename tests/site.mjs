@@ -77,7 +77,7 @@ const result = {sourceRecords: 58, recordsByteIdenticalExceptImageURLs: true, im
     if (character === '{') depth++; else if (character === '}' && --depth === 0) {end++; break;}
   }
   const translations = JSON.parse(html.slice(start + 'translations='.length, end));
-  const outside = html.slice(0, start) + html.slice(end);
+  const outside = html.slice(0, start) + html.slice(end) + references.filter(entry=>entry.assetStatus==='available').flatMap(entry=>[entry.city,entry.context,entry.caption,entry.disclosure]).join('\n');
   const locales = Object.keys(translations), base = new Set(Object.keys(translations[locales[0]]));
   for (const locale of locales) {
     const keys = Object.keys(translations[locale]);
@@ -107,6 +107,8 @@ try {
   for(const entry of availableReferences){
     const dimensions=await ev(`(async()=>{const image=new Image();image.src=${JSON.stringify(entry.image)};await image.decode();return {width:image.naturalWidth,height:image.naturalHeight};})()`);
     assert.ok(dimensions.width>0&&dimensions.height>0, `Editorial image did not decode: ${entry.id}`);
+    assert.equal(dimensions.width,entry.width, `Incorrect editorial width: ${entry.id}`);
+    assert.equal(dimensions.height,entry.height, `Incorrect editorial height: ${entry.id}`);
     result.editorialImages.push({id:entry.id,...dimensions});
   }
   check(`${availableReferences.length} available editorial images have unique catalog IDs, valid local assets and successful browser decoding`);
