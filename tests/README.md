@@ -23,6 +23,9 @@ node tests/pages.mjs
 
 For a focused interaction/keyboard rerun, use `node tests/site.mjs --interactions-only`; that mode explicitly omits the layout matrix.
 
+The shared browser harness allows up to 30 seconds for the initial DevTools port file on a cold runner. A spawn error or early process exit fails promptly, reporting the selected executable, error/exit status and the last 8 KB of browser stderr. Non-missing-file errors while reading readiness information are surfaced rather than swallowed. Application assertions, navigation timeouts and worker deadlines remain unchanged; a failed browser launch still fails the suite. CI selects its installed Google Chrome through `CHROMIUM`; local runs default to Chromium.
+
+
 Set `CHROMIUM` if Chromium is not at `/usr/bin/chromium`. JSON results go to `/tmp/reference-regression-results/`; set `RESULTS_DIR` to change that location. Loopback server/browser permissions may be needed in a sandbox.
 
 The migration fixture defaults to commit `746988f` (version 43, shell v2). To also check the earlier version 42 installation:
