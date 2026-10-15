@@ -45,7 +45,10 @@ try{
  assert.equal(await page.evaluate("document.querySelectorAll('.personal-source').length"),1);
  assert.ok(await page.evaluate("Promise.all([...document.images].map(i=>i.decode())).then(()=>true)"));
  assert.ok(await page.evaluate("document.fonts.size===2&&[...document.fonts].every(f=>f.status==='loaded')"));
- await page.navigate(base+'index.html');assert.deepEqual(await page.evaluate('({...localStorage})'),saved);
+ await page.evaluate("document.querySelector('#mobile-saved').click()");
+ assert.ok(await page.evaluate("!document.querySelector('#my-sources').hidden&&document.querySelectorAll('.collection-source').length===1&&document.querySelectorAll('.personal-source').length===1"));
+ await page.navigate(base+'index.html#my-sources');assert.deepEqual(await page.evaluate('({...localStorage})'),saved);
+ assert.ok(await page.evaluate("!document.querySelector('#my-sources').hidden&&document.querySelector('#mobile-saved-count').textContent==='2'"));
  assert.deepEqual(page.exceptions,[]);
  check('Published paths preserve favorites and personal records during offline reload and index navigation');
  result.passed=true;
