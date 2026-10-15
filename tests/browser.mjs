@@ -37,7 +37,10 @@ export async function browser(handler) {
     '--headless', '--no-sandbox', '--disable-dev-shm-usage', '--disable-gpu',
     '--no-first-run', '--no-default-browser-check', '--remote-debugging-port=0',
     '--user-data-dir=' + profile, 'about:blank',
-  ], {stdio: 'ignore'});
+  ], {stdio: ['ignore','ignore','pipe']});
+  let chromeDiagnostics='',chromeError;
+  chrome.stderr.on('data',chunk=>{chromeDiagnostics=(chromeDiagnostics+chunk.toString()).slice(-8000);});
+  chrome.on('error',error=>{chromeError=error;});
   let ws, sequence = 0;
   const pending = new Map(), exceptions = [], navigations = [];
   async function close() {
@@ -53,11 +56,12 @@ export async function browser(handler) {
   }
   try {
     let port;
-    for (let i = 0; i < 200; i++) {
+    for (let i = 0; i < 600; i++) {
+      if(chromeError||chrome.exitCode!==null||chrome.signalCode!==null)break;
       try {port = (await readFile(path.join(profile, 'DevToolsActivePort'), 'utf8')).split('\n')[0]; break;}
       catch {await pause(50);}
     }
-    assert.ok(port, 'Chromium did not start (set CHROMIUM to its executable)');
+    assert.ok(port, 'Chromium did not start: '+(chromeError?.message||chrome.signalCode||chrome.exitCode||'startup timeout')+'\n'+chromeDiagnostics);
     const tabs = await (await fetch(`http://127.0.0.1:${port}/json/list`)).json();
     ws = new WebSocket(tabs.find(tab => tab.type === 'page').webSocketDebuggerUrl);
     await new Promise((resolve, reject) => {ws.addEventListener('open', resolve, {once: true}); ws.addEventListener('error', reject, {once: true});});
