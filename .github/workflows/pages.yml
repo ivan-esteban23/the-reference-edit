@@ -34,6 +34,7 @@ jobs:
       - run: node tests/personal-sources.mjs
       - run: node tests/personal-backup.mjs
       - run: node tests/collection-backup.mjs
+      - run: node tests/source-notes.mjs
       - run: node tests/service-worker.mjs
       - run: node --test tests/worker-storage.mjs
       - run: node tests/pages.mjs

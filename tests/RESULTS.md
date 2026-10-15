@@ -1,3 +1,11 @@
+# Saved directory notes validation
+
+Saved directory cards now offer Add/Edit note with a native editor, clear-to-delete behavior and plain-text display. Collection search includes note text. Notes are retained when a source is unsaved and reappear when it is saved again; retained-note guidance and notes-only export prevent accidental loss. All six languages have translated controls and recovery messages. Note text stays unchanged and is not added to URLs.
+
+A separate versioned notes key preserves existing favorites and personal-source storage formats. Saving rereads current notes, preserves other entries and detects conflicting edits to the same note. Failed writes/corrupt storage keep the draft and stored data intact. Complete backup export advances to version 2 with `directoryNotes`; both older version 1 formats remain importable without overwriting notes. Imports validate all notes, keep existing text and include notes in existing rollback/retry handling. This remains a best-effort multi-key operation, not a transaction.
+
+Passed locally: note suite (seven groups and 96 editor viewport/text-size/theme/language cases), site (96 layouts and twelve groups), collection (96 layouts and seven groups), both existing backup suites (192 layouts and fifteen groups), and Pages preparation (four groups, including a prefixed offline note). Tests cover inert Unicode/HTML-looking text, search, retention, notes-only export, fresh restore, legacy imports, invalid notes, storage failure, conflicts and offline editing/backup. Mobile editor capture inspected. The original 58 source records and image/font bytes are preserved. Worker key: `visual-edit-shell-source-notes-v1`. Physical-device/Safari review and publication remain pending; CI runs all regressions.
+
 # Source chooser validation
 
 Added a collapsed “Help me choose” shortcut to the directory introduction, with links from all three research guides. Four goals—editorial design, fashion history, street style and organizing references—each offer three maintained catalog entries with a short reason and access status. Suggestions use separate `.chooser-card` elements; all 58 original `.source` records remain unchanged. New controls/copy support all six languages. There are no new services, accounts or saved preference keys.
