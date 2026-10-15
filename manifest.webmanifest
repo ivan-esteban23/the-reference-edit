@@ -11,19 +11,19 @@
   "theme_color": "#F7F4EE",
   "icons": [
     {
-      "src": "/the-reference-edit/icons/icon-192.png",
+      "src": "/the-reference-edit/icons/reference-edit-192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/the-reference-edit/icons/icon-512.png",
+      "src": "/the-reference-edit/icons/reference-edit-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/the-reference-edit/icons/maskable-512.png",
+      "src": "/the-reference-edit/icons/reference-edit-maskable-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
