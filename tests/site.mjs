@@ -66,6 +66,8 @@ try {
   assert.ok(await ev("document.querySelector('#storage-warning').getClientRects().length>0"),'Storage warning hidden inside collapsed tools');
   await ev('storageAvailable=true;refreshFavorites()');
   check('Compact mobile entry reaches search/cards sooner and keeps collection tools accessible');
+  assert.equal(await ev("document.querySelectorAll('.research-route').length"),3);
+  assert.ok(await ev("[...document.querySelectorAll('#routes details')].every(d=>!d.open)"));
   // Exercise disclosures while measuring; a collapsed page can hide overflow bugs.
   await ev("document.querySelectorAll('details').forEach(d=>d.open=true)");
   const widths=process.argv.includes('--interactions-only')?[]:[320,390,768,1440];
@@ -78,7 +80,7 @@ try {
       const errors=[],describe=e=>e.id||e.className||e.tagName;
       const overlap=(a,b)=>a.left<b.right-1&&b.left<a.right-1&&a.top<b.bottom-1&&b.top<a.bottom-1;
       if(document.documentElement.scrollWidth>innerWidth+1)errors.push('document overflow');
-      const selectors='.hero h1,.cover-image figcaption,.hero-actions a,.masthead>span,.masthead button,.language-switch,.controls input,.controls button,.source h3,.source-purpose,.source-actions button,.source-details summary,.filter-field label,.footer-nav a';
+      const selectors='.research-route summary strong,.research-route .route-body h4,.research-route .route-body p,.guide-record summary,.hero h1,.cover-image figcaption,.hero-actions a,.masthead>span,.masthead button,.language-switch,.controls input,.controls button,.source h3,.source-purpose,.source-actions button,.source-details summary,.filter-field label,.footer-nav a';
       for(const e of document.querySelectorAll(selectors)){
         if(!visible(e))continue;const r=e.getBoundingClientRect();
         if(r.left < -1 || r.right>innerWidth+1)errors.push('outside viewport: '+describe(e));
@@ -130,16 +132,27 @@ try {
   assert.ok(await ev("document.documentElement.lang==='es'&&document.documentElement.dataset.theme==='dark'&&favoriteKeys.size===1"));
   check('Favorites/theme/language persistence on reload and reopen; shared filter restoration');
   await select('#language', 'en');
+  await navigate('/?guide-check=1#workflow');
+  for(const id of ['workflow','landscape','notes']){
+    await ev(`location.hash=${JSON.stringify('#'+id)}`);await pause(100);
+    assert.ok(await ev(`document.querySelector('#${id}').open`),'Legacy guide link stayed collapsed: '+id);
+  }
+  await ev("location.hash='#routes'");await pause(100);
+  await ev("document.querySelector('.research-route summary').focus()");await key('Enter');assert.equal(await ev("document.querySelector('.research-route').open"),true);
+  await key(' ','Space');assert.equal(await ev("document.querySelector('.research-route').open"),false);
+  await ev("history.pushState(null,'','#directory');search.value='Japan';update();history.back()");await pause(100);
+  assert.ok(await ev("location.hash==='#routes'&&search.value===''&&!collectionOpen"),'Back navigation lost the guide to stale directory filters');
+  check('Three concise guides, legacy fragments, browser Back and native keyboard disclosure controls');
   await ev("document.querySelectorAll('.source-details').forEach(d=>d.open=false);document.querySelector('.source-details summary').focus()");
   await key('Enter'); assert.equal(await ev("document.querySelector('.source-details').open"), true);
   await key(' ' ,'Space'); assert.equal(await ev("document.querySelector('.source-details').open"), false);
-  const disclosureStates = await ev("[...document.querySelectorAll('.source-details,.research-route')].map(d=>d.open)");
+  const disclosureStates = await ev("[...document.querySelectorAll('.source-details,.research-route,.guide-record')].map(d=>d.open)");
   await ev("window.dispatchEvent(new Event('beforeprint'))");
-  assert.ok(await ev("[...document.querySelectorAll('.source-details,.research-route')].every(d=>d.open)"));
+  assert.ok(await ev("[...document.querySelectorAll('.source-details,.research-route,.guide-record')].every(d=>d.open)"));
   await call('Emulation.setEmulatedMedia', {media: 'print'});
   assert.equal(await ev("[...document.querySelectorAll('.source-details .source-metadata')].filter(e=>getComputedStyle(e).display!=='none').length"), 58);
   await call('Emulation.setEmulatedMedia', {media: ''}); await ev("window.dispatchEvent(new Event('afterprint'))");
-  assert.deepEqual(await ev("[...document.querySelectorAll('.source-details,.research-route')].map(d=>d.open)"), disclosureStates);
+  assert.deepEqual(await ev("[...document.querySelectorAll('.source-details,.research-route,.guide-record')].map(d=>d.open)"), disclosureStates);
   check('Real Enter/Space disclosure control; print expands every record and restores disclosure states');
   await ev("document.querySelector('[data-theme-toggle]').focus()"); await key('Tab');
   assert.ok(await ev("document.activeElement.id==='language'&&document.activeElement.matches(':focus-visible')&&getComputedStyle(document.querySelector('.language-switch')).outlineStyle!=='none'"));

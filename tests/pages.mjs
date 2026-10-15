@@ -49,6 +49,7 @@ try{
  assert.ok(await page.evaluate("!document.querySelector('#my-sources').hidden&&document.querySelectorAll('.collection-source').length===1&&document.querySelectorAll('.personal-source').length===1"));
  await page.navigate(base+'index.html#my-sources');assert.deepEqual(await page.evaluate('({...localStorage})'),saved);
  assert.ok(await page.evaluate("!document.querySelector('#my-sources').hidden&&document.querySelector('#mobile-saved-count').textContent==='2'"));
+ await page.evaluate("location.hash='#workflow'");await page.until("document.querySelector('#workflow').open&&!collectionOpen");
  assert.deepEqual(page.exceptions,[]);
  check('Published paths preserve favorites and personal records during offline reload and index navigation');
  result.passed=true;
