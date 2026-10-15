@@ -12,6 +12,7 @@ node tests/site.mjs
 node tests/chooser.mjs
 node --test tests/worker-storage.mjs
 node tests/collection.mjs
+node tests/recently-viewed.mjs
 node tests/personal-sources.mjs
 node tests/personal-backup.mjs
 node tests/collection-backup.mjs
@@ -74,6 +75,10 @@ Use current macOS Safari and an iPhone/iPad Safari installation over HTTPS. Reco
 `collection.mjs` runs seven functional groups and 96 collection layout/language/theme/text-size cases. It covers both navigation entry points, empty-state guidance, prior-format data without writes/migration, combined counts, origin filters, shared search, independent directory filters, browser history, directory details, removal/edit/delete, keyboard focus, cross-tab storage notifications, failed/corrupt favorite storage and offline persistence. Current captures go to `/tmp/reference-collection-results/`. Directory records are represented by separate `.collection-source` cards, so the 58 original `.source` records remain intact. Existing storage formats are retained; JSON version 1 files remain importable alongside the new version 2 export.
 
 `collection-backup.mjs` verifies real complete and directory-only downloads, fresh-device restoration of both stores, mixed duplicates and missing catalog URLs, existing metadata/favorite preservation, malformed/unsafe files, corrupt destination data, latest-storage rechecks, failures in either write, rollback failure/retry, and complete offline export/restore. It also checks 96 populated-preview viewport/text-size/theme/language cases. Captures go to `/tmp/reference-complete-backup-results/`.
+
+A “Recently viewed” section in My collection lists up to eight curated sources opened from directory cards, chooser suggestions, saved directory cards or the section itself, most recent first, using `reference-edit-recently-viewed-v1` (`{version:1,items:[url,…]}`). Matching records appear with the shared “View in directory” action; personal sources and URLs absent from the catalog are never displayed. Opening a listed source refreshes its position without duplicating it, and “Clear list” forgets the history. The history never changes favorites, notes or personal sources, is local to this browser, works offline and is not included in backups. Corrupt or unavailable storage leaves the section hidden, a failed write keeps the previous list, and the next opened source replaces corrupt data.
+
+`recently-viewed.mjs` runs eleven functional check groups and 96 layout/language/theme/text-size cases. It covers deduplication and ordering, the eight-entry cap, reload persistence, translated labels, corrupt/quota storage, catalog pruning, chooser/collection/personal-source recording rules, filter clearing and keyboard focus, and offline clearing/recording/navigation; external providers are never visited. Current capture: `/tmp/reference-recent-results/mobile.png`.
 
 Research guides consolidate reading, project routes, workflow and the reference record into `#routes`. Three native disclosures cover inspiration, topic research and moodboards; `#notes` retains one shared record template. Historic `#workflow` and `#landscape` fragments open their matching guides, and native keyboard controls/print expansion are covered by the site suite. The 96-case layout matrix includes expanded guide headings and body copy. Pages checks also open the moodboard guide offline from the collection view.
 

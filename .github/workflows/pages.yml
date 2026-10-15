@@ -31,6 +31,7 @@ jobs:
       - run: node tests/site.mjs
       - run: node tests/chooser.mjs
       - run: node tests/collection.mjs
+      - run: node tests/recently-viewed.mjs
       - run: node tests/personal-sources.mjs
       - run: node tests/personal-backup.mjs
       - run: node tests/collection-backup.mjs
