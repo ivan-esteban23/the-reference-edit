@@ -3,15 +3,17 @@ import vm from 'node:vm';
 import {assets, baseline, browser, gitFile, pause, report, serve} from './browser.mjs';
 
 const files = await assets(), oldFiles = new Map(files);
-const installIcon = JSON.parse(files.get("/manifest.webmanifest")).icons.find(icon=>icon.sizes==="512x512"&&icon.purpose==="any").src;
 for (const name of ['index.html', 'sw.js']) oldFiles.set('/' + name, gitFile(baseline, 'dist/' + name));
 for (const [map, revision] of [[oldFiles, 'old'], [files, 'new']]) {
   map.set('/index.html', Buffer.from(map.get('/index.html').toString().replace('<head>', `<head><meta name="test-revision" content="${revision}">`)));
 }
 const cacheName = map => map.get('/sw.js').toString().match(/const CACHE='([^']+)'/)[1];
 const oldCache = cacheName(oldFiles), newCache = cacheName(files);
+const oldShell = vm.runInNewContext(oldFiles.get('/sw.js').toString().match(/const SHELL=(\[[^;]+\]);/)[1]);
 const newShell = vm.runInNewContext(files.get('/sw.js').toString().match(/const SHELL=(\[[^;]+\]);/)[1]);
 // Only content-addressed page images use this worker's on-demand caching route.
+const galleryAssets = ['/data/references.json',...JSON.parse(files.get('/data/references.json')).references.filter(r=>r.assetStatus==='available').map(r=>r.image)];
+assert.ok(galleryAssets.every(path=>newShell.includes(path)), 'Gallery assets must be in the required offline shell');
 const imagePaths = [...files.keys()].filter(path=>/^\/images\/image-[a-f0-9]{16}\.(?:png|jpg|gif|ico|svg)$/.test(path));
 const logoPath = imagePaths.find(path=>!newShell.includes(path));
 assert.notEqual(oldCache, newCache, 'Migration fixture must have an older shell version');
@@ -23,7 +25,7 @@ const page = await browser((req, res, later) => {
   if (!connected) {req.socket.destroy(); return;}
   const pathname = new URL(req.url, 'http://localhost').pathname;
   if (mode === 'image-error' && pathname === logoPath) {res.writeHead(503); res.end(); return;}
-  if (mode === 'broken-install' && pathname === installIcon) {res.writeHead(503); res.end(); return;}
+  if (mode === 'broken-install' && pathname === galleryAssets[1]) {res.writeHead(503); res.end(); return;}
   if (mode === 'error' && (pathname === '/' || pathname === '/index.html')) {res.writeHead(503); res.end(); return;}
   if (pathname === '/index.html') {res.writeHead(302, {Location: '/'}); res.end(); return;}
   if (pathname === '/' && mode.startsWith('slow-')) {
@@ -39,7 +41,7 @@ const offline = value => {connected = !value; return call('Network.emulateNetwor
 try {
   await navigate();
   await until('!!navigator.serviceWorker.controller', 'Old worker did not claim page');
-  await until(`caches.open(${JSON.stringify(oldCache)}).then(c=>c.keys()).then(k=>k.length===7)`, 'Old offline shell incomplete');
+  await until(`caches.open(${JSON.stringify(oldCache)}).then(c=>c.keys()).then(k=>k.length===${oldShell.length})`, 'Old offline shell incomplete');
   const saved = await ev(`(()=>{
     document.querySelector('.favorite-source').click();document.querySelectorAll('.source')[2].querySelector('.favorite-source').click();
     const oldTheme=document.querySelector('[data-theme-choice=dark]');
@@ -77,6 +79,8 @@ try {
   }
   await offline(true); await navigate('', true); await verify();
   assert.ok(await ev("document.querySelector('.cover-image img').decode().then(()=>true)"), 'Precached cover unavailable on first offline reload');
+  await until("document.querySelectorAll('.editorial-card img').length===3");
+  assert.ok(await ev("Promise.all([...document.querySelectorAll('.editorial-card img')].map(i=>i.decode())).then(()=>true)"));
   check('First reload after upgrade displays new revision offline; preferences and shared filters retained');
   await offline(false);
   mode = 'online'; await navigate('', true);

@@ -34,3 +34,10 @@ node scripts/prepare-pages.mjs "$pages_directory/site" /the-reference-edit/ "$(g
 The output directory must be fresh and outside the checkout. The script does no transpilation, dependency installation or font/image conversion. The site continues to work directly from `dist/` for normal local development.
 
 `node tests/pages.mjs` verifies scoped routing, manifest/worker registration, installability, cache cleanup, fonts/images, local favorites/personal records and offline navigation against the prepared snapshot.
+
+
+## Editorial gallery catalog and offline paths
+
+`dist/data/references.json` is copied byte-for-byte into the prepared snapshot. The preparation script scopes the HTML's catalog URL and worker shell URLs; it does not rewrite image paths inside this JSON. The gallery explicitly resolves each validated canonical `/images/references/...` value relative to the application root derived from its catalog URL, so the same catalog works at `/` and `/the-reference-edit/`.
+
+The catalog and all three local editorial JPEGs are required precache assets. Bump the source worker cache version whenever the UI, catalog or an illustration changes. Failed downloads/writes leave an existing worker installation active; offline gallery availability requires a completed installation and retained browser cache. Pages and worker migration tests exercise the project path, offline images and upgrades. The gallery test runs in the existing read-only CI test job; publication conditions and permissions remain unchanged.
