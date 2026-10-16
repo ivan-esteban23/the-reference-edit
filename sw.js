@@ -1,5 +1,5 @@
 // Version the offline shell whenever index.html or its app assets change.
-const CACHE='reference-edit-pages-shell-0ef61a453e6fb52c2da7a09709633196e44ad9dd';
+const CACHE='reference-edit-pages-shell-0b2d39d58b17240c0614122beb117a682684fd5f';
 // Precache the cover, gallery catalog and three illustrations. Source logos cache on demand.
 const SHELL=['/the-reference-edit/data/references.json','/the-reference-edit/images/references/tokyo-street/tokyo-street-01.jpg','/the-reference-edit/images/references/seoul-fashion-week/seoul-fashion-week-01.jpg','/the-reference-edit/images/references/paris-office/paris-office-01.jpg','/the-reference-edit/index.html','/the-reference-edit/manifest.webmanifest','/the-reference-edit/favicon.svg','/the-reference-edit/icons/reference-edit-192.png','/the-reference-edit/icons/reference-edit-512.png','/the-reference-edit/icons/reference-edit-maskable-512.png','/the-reference-edit/icons/reference-edit-apple-touch-180.png','/the-reference-edit/icons/reference-edit-favicon-64.png','/the-reference-edit/images/image-d75e09331c4509f9.jpg','/the-reference-edit/fonts/font-8a08d13f8a6c0d51.ttf','/the-reference-edit/fonts/font-29160a80ff49ddca.ttf'];
 // Hosting may redirect /index.html to /. Store a fresh response so navigation can reuse it safely.
