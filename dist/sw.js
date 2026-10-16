@@ -1,5 +1,5 @@
 // Version the offline shell whenever index.html or its app assets change.
-const CACHE='visual-edit-shell-content-cleanup-v1';
+const CACHE='visual-edit-shell-figma-editorial-v1';
 // Only the cover and favicon are needed for the first offline paint. Source logos cache on demand.
 const SHELL=['/index.html','/manifest.webmanifest','/favicon.svg','/icons/reference-edit-192.png','/icons/reference-edit-512.png','/icons/reference-edit-maskable-512.png','/icons/reference-edit-apple-touch-180.png','/icons/reference-edit-favicon-64.png','/images/image-d75e09331c4509f9.jpg','/fonts/font-8a08d13f8a6c0d51.ttf','/fonts/font-29160a80ff49ddca.ttf'];
 // Hosting may redirect /index.html to /. Store a fresh response so navigation can reuse it safely.
