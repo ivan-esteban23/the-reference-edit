@@ -1,0 +1,1 @@
+if(/^https?:$/.test(location.protocol)){for(const [rel,href] of [["manifest","/manifest.webmanifest"]] as [string,string][]){const link=document.createElement("link");link.rel=rel;link.href=href;document.head.append(link);}}

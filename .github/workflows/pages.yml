@@ -24,6 +24,12 @@ jobs:
       - uses: actions/setup-node@v5
         with:
           node-version: '24'
+          cache: npm
+      - run: npm ci
+      - name: Type check
+        run: npm run typecheck
+      - name: Build the site
+        run: npm run build
       - name: Locate Chromium
         run: |
           chrome_binary=$(command -v google-chrome)
@@ -38,6 +44,7 @@ jobs:
       - run: node tests/collection-backup.mjs
       - run: node tests/collection-folders.mjs
       - run: node tests/source-notes.mjs
+      - run: node tests/storage-compat.mjs
       - run: node tests/service-worker.mjs
       - run: node --test tests/worker-storage.mjs
       - run: node tests/pages.mjs
@@ -62,6 +69,10 @@ jobs:
       - uses: actions/setup-node@v5
         with:
           node-version: '24'
+          cache: npm
+      - run: npm ci
+      - name: Build the site
+        run: npm run build
       - name: Prepare GitHub Pages files
         run: node scripts/prepare-pages.mjs "$RUNNER_TEMP/reference-pages" /the-reference-edit/ "$GITHUB_SHA"
       - name: Publish the Pages source branch

@@ -1,0 +1,6 @@
+node_modules/
+# npm run build writes the published site from src/.
+dist/
+/tmp/
+*.log
+.DS_Store

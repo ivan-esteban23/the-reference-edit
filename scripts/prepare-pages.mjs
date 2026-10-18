@@ -1,4 +1,5 @@
-// Prepare a Pages snapshot without changing the maintained dist/ files.
+// Prepare a Pages snapshot from the built site without changing it.
+import {existsSync} from 'node:fs';
 import {cp,mkdir,readFile,writeFile} from 'node:fs/promises';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
@@ -8,6 +9,7 @@ const [destination,base='/the-reference-edit/',revision='local']=process.argv.sl
 if(!destination||!/^\/(?:[a-zA-Z0-9_-]+\/)*$/.test(base)||!/^[-a-zA-Z0-9]+$/.test(revision))throw Error('Usage: node scripts/prepare-pages.mjs OUTPUT /base/ REVISION');
 const output=path.resolve(destination);
 if(output===root||output.startsWith(root+path.sep))throw Error('Use an output directory outside the source checkout');
+if(!existsSync(path.join(root,'dist/index.html')))throw Error('dist/ is not built; run npm run build first');
 await mkdir(path.dirname(output),{recursive:true});await cp(path.join(root,'dist'),output,{recursive:true,errorOnExist:true,force:false});
 const scoped=text=>text.replace(/(["'])(\/(?!\/)[^"'\\\s]*?)\1/g,(_,quote,url)=>quote+base+url.slice(1)+quote);
 const htmlPath=path.join(output,'index.html'),original=await readFile(htmlPath,'utf8');

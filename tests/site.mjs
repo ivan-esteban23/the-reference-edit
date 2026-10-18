@@ -1,7 +1,9 @@
 import assert from 'node:assert/strict';
 import vm from 'node:vm';
+import {readFile} from 'node:fs/promises';
+import path from 'node:path';
 import {createHash} from 'node:crypto';
-import {assets, baseline, browser, gitFile, pause, report, serve} from './browser.mjs';
+import {assets, baseline, browser, gitFile, pause, repo, report, serve} from './browser.mjs';
 
 const files = await assets(), html = files.get('/index.html').toString();
 const before = gitFile(baseline, 'dist/index.html').toString();
@@ -67,23 +69,39 @@ for (const match of html.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script>/gi)) {
 }
 const result = {sourceRecords: 58, recordsByteIdenticalExceptImageURLs: true, imagesByteIdentical: embedded.length, fontsByteIdentical: embeddedFonts.length, scriptsCompiled: scripts, layouts: [], checks: []};
 {
-  const marker = 'translations={', start = html.indexOf(marker);
-  assert.ok(start > 0, 'Translations object missing');
-  let depth = 0, end = start + 'translations='.length, inString = false, quote = '', escaped = false;
-  for (; end < html.length; end++) {
-    const character = html[end];
-    if (inString) {if (escaped) {escaped = false; continue;} if (character === '\\') {escaped = true; continue;} if (character === quote) inString = false; continue;}
-    if (character === '"' || character === "'") {inString = true; quote = character; continue;}
-    if (character === '{') depth++; else if (character === '}' && --depth === 0) {end++; break;}
+  // The tables live in src/ts/i18n-*.ts, one per locale, as JSON-compatible object literals.
+  const tables = {es:'i18nEs','zh-Hans':'i18nZhHans','zh-Hant':'i18nZhHant',ja:'i18nJa',ko:'i18nKo'};
+  const literal = (source, declaration) => {
+    const found = source.search(declaration);
+    assert.ok(found >= 0, `Missing translation table ${declaration}`);
+    const open = source.indexOf('{', found);
+    let depth = 0, end = open, inString = false, quote = '', escaped = false;
+    for (; end < source.length; end++) {
+      const character = source[end];
+      if (inString) {if (escaped) {escaped = false; continue;} if (character === '\\') {escaped = true; continue;} if (character === quote) inString = false; continue;}
+      if (character === '"' || character === "'") {inString = true; quote = character; continue;}
+      if (character === '{') depth++; else if (character === '}' && --depth === 0) {end++; break;}
+    }
+    return {text: source.slice(open, end), start: open, end};
+  };
+  const translations = {};
+  for (const [locale, variable] of Object.entries(tables)) {
+    const source = await readFile(path.join(repo, 'src/ts', `i18n-${locale.toLowerCase()}.ts`), 'utf8');
+    translations[locale] = JSON.parse(literal(source, new RegExp(`const ${variable}[^{]*\\{`)).text);
   }
-  const translations = JSON.parse(html.slice(start + 'translations='.length, end));
-  const outside = html.slice(0, start) + html.slice(end) + references.filter(entry=>entry.assetStatus==='available').flatMap(entry=>[entry.city,entry.context,entry.caption,entry.disclosure]).join('\n');
   const locales = Object.keys(translations), base = new Set(Object.keys(translations[locales[0]]));
   for (const locale of locales) {
     const keys = Object.keys(translations[locale]);
     assert.deepEqual(keys.filter(key => !base.has(key)), [], `${locale} has extra translation keys`);
     assert.deepEqual([...base].filter(key => !keys.includes(key)), [], `${locale} is missing translation keys`);
   }
+  // Strip the tables from the built page, so a key only passes by being used somewhere else.
+  let outside = html;
+  for (const variable of Object.values(tables)) {
+    const found = literal(outside, new RegExp(`const ${variable}\\s*=`));
+    outside = outside.slice(0, found.start) + outside.slice(found.end);
+  }
+  outside += availableReferences.flatMap(entry=>[entry.city,entry.context,entry.caption,entry.disclosure]).join('\n');
   const stale = [...base].filter(key => !outside.includes(key) && !outside.includes(key.replace(/&/g, '&amp;')));
   assert.deepEqual(stale, [], 'Stale translation keys: ' + stale.slice(0, 5).join(' | '));
 }
