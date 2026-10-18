@@ -552,7 +552,15 @@ summary:hover{background:var(--soft)}
 @media(max-width:639px){.hero-actions{row-gap:4px;margin-top:12px}.editorial-heading{gap:var(--space-2);margin-bottom:var(--space-3)}}
 @media(min-width:960px){.editorial-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:24px}.editorial-heading{grid-template-columns:minmax(0,1fr) auto;gap:32px;margin-bottom:40px}.editorial-gallery{padding:64px 0 80px}.editorial-card:nth-child(2){padding-top:48px}}
 @media print{.editorial-heading>a,.editorial-retry{display:none!important}.editorial-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}.editorial-card{break-inside:avoid}}
-</style><meta name="apple-mobile-web-app-title" content="The Reference Edit"><script>if(/^https?:$/.test(location.protocol)){for(const [rel,href] of [["manifest","/manifest.webmanifest"]]){const link=document.createElement("link");link.rel=rel;link.href=href;document.head.append(link);}}</script></head><body><!-- Bundled Newsreader and Inter font licenses:
+</style><meta name="apple-mobile-web-app-title" content="The Reference Edit"><script>if (/^https?:$/.test(location.protocol)) {
+	for (const [rel, href] of [["manifest", "/manifest.webmanifest"]]) {
+		const link = document.createElement("link");
+		link.rel = rel;
+		link.href = href;
+		document.head.append(link);
+	}
+}
+</script></head><body><!-- Bundled Newsreader and Inter font licenses:
 Newsreader
 Copyright 2020 The Newsreader Project Authors (http://github.com/productiontype/Newsreader)
 
@@ -973,24 +981,57 @@ window.addEventListener('keydown',event=>{if((event.metaKey||event.ctrlKey)&&eve
  render();
  if('serviceWorker' in navigator){navigator.serviceWorker.register('/sw.js',{scope:'/',updateViaCache:'none'}).then(observe).catch(()=>{offlineState='failed';render();});navigator.serviceWorker.ready.then(reg=>{registration=reg;checkOffline();render();});window.addEventListener('online',()=>{registration?.update().catch(()=>{});checkOffline();});document.addEventListener('visibilitychange',()=>{if(!document.hidden){registration?.update().catch(()=>{});checkOffline();}});}else{offlineState='failed';render();}
 })();
-</script><script>
-(()=>{
- const root=document.documentElement, toggle=document.querySelector('[data-theme-toggle]'), system=matchMedia('(prefers-color-scheme: dark)');
- let explicit=false;
- try{explicit=['light','dark'].includes(localStorage.getItem('visual-edit-theme'));}catch(e){}
- function apply(theme){root.dataset.theme=theme;document.querySelector('meta[name="theme-color"]').content=theme==='dark'?'#191817':'#F7F4EE';toggle?.setAttribute('aria-pressed',String(theme==='dark'));}
- apply(root.dataset.theme);
- toggle?.addEventListener('click',()=>{explicit=true;const next=root.dataset.theme==='dark'?'light':'dark';apply(next);try{localStorage.setItem('visual-edit-theme',next);}catch(e){}});
- const followSystem=()=>{if(!explicit)apply(system.matches?'dark':'light');};
- if(system.addEventListener)system.addEventListener('change',followSystem);else system.addListener(followSystem);
- window.addEventListener('storage',event=>{if(event.key!=='visual-edit-theme'&&event.key!==null)return;explicit=event.newValue==='light'||event.newValue==='dark';if(explicit)apply(event.newValue);else followSystem();});
+</script><script>(() => {
+	const root = document.documentElement, toggle = document.querySelector("[data-theme-toggle]"), system = matchMedia("(prefers-color-scheme: dark)");
+	let explicit = false;
+	try {
+		explicit = ["light", "dark"].includes(localStorage.getItem("visual-edit-theme") ?? "");
+	} catch (e) {}
+	function apply(theme) {
+		root.dataset.theme = theme;
+		const meta = document.querySelector("meta[name=\"theme-color\"]");
+		if (meta) meta.content = theme === "dark" ? "#191817" : "#F7F4EE";
+		toggle?.setAttribute("aria-pressed", String(theme === "dark"));
+	}
+	apply(root.dataset.theme);
+	toggle?.addEventListener("click", () => {
+		explicit = true;
+		const next = root.dataset.theme === "dark" ? "light" : "dark";
+		apply(next);
+		try {
+			localStorage.setItem("visual-edit-theme", next);
+		} catch (e) {}
+	});
+	const followSystem = () => {
+		if (!explicit) apply(system.matches ? "dark" : "light");
+	};
+	if (system.addEventListener) system.addEventListener("change", followSystem);
+	else system.addListener(followSystem);
+	window.addEventListener("storage", (event) => {
+		if (event.key !== "visual-edit-theme" && event.key !== null) return;
+		explicit = event.newValue === "light" || event.newValue === "dark";
+		if (explicit) apply(event.newValue ?? undefined);
+		else followSystem();
+	});
 })();
-(()=>{
- const select=document.querySelector('#language'), code=document.querySelector('.language-code');
- if(!select||!code)return;
- const short={'zh-Hans':'简体','zh-Hant':'繁體','ja':'日本語','ko':'한국어','es':'ES','en':'EN'};
- const sync=()=>{code.dataset.code=short[select.value]||select.value.toUpperCase();};
- select.addEventListener('change',sync);window.addEventListener('visual-edit:languagechange',sync);window.addEventListener('popstate',sync);sync();
+(() => {
+	const select = document.querySelector("#language"), code = document.querySelector(".language-code");
+	if (!select || !code) return;
+	const short = {
+		"zh-Hans": "简体",
+		"zh-Hant": "繁體",
+		"ja": "日本語",
+		"ko": "한국어",
+		"es": "ES",
+		"en": "EN"
+	};
+	const sync = () => {
+		code.dataset.code = short[select.value] || select.value.toUpperCase();
+	};
+	select.addEventListener("change", sync);
+	window.addEventListener("visual-edit:languagechange", sync);
+	window.addEventListener("popstate", sync);
+	sync();
 })();
 </script><script>
 // Personal sources are independent of the curated records and their favorites.
@@ -1471,50 +1512,127 @@ window.addEventListener('keydown',event=>{if((event.metaKey||event.ctrlKey)&&eve
 })();
 
 </script>
-<script>
-(()=>{
- const grid=document.querySelector('#editorial-grid'),status=document.querySelector('#editorial-status'),retry=document.querySelector('#editorial-retry');
- // Pages preparation scopes this URL. JSON image paths stay canonical; resolve them against the catalog's app root explicitly.
- const catalogURL=new URL('/data/references.json',location.href),appRoot=new URL('../',catalogURL);
- let state='loading',cards=[],requestId=0;
- const messages={loading:'Loading editorial studies…',error:'Editorial studies are unavailable. Try again when connected.',empty:'No editorial studies are available yet.'};
- function localize(){
-  status.hidden=state==='ready';status.textContent=t(messages[state]||'');retry.hidden=state!=='error';retry.textContent=t('Try again');
-  for(const card of cards){const {entry,image,city,context,caption,disclosure,missing}=card;
-   city.textContent=t(entry.city);context.textContent=t(entry.context);caption.textContent=t(entry.caption);disclosure.textContent=t(entry.disclosure);
-   image.alt=t(entry.city)+'. '+t(entry.caption);missing.textContent=t('Image unavailable. The editorial caption is still available below.');
-  }
- }
- function render(entries){
-  grid.replaceChildren();cards=[];
-  entries.forEach((entry,index)=>{
-   const figure=document.createElement('figure');figure.className='editorial-card';figure.dataset.referenceId=entry.id;
-   const frame=document.createElement('div');frame.className='editorial-image';frame.style.setProperty('--editorial-ratio',entry.width+' / '+entry.height);
-   const image=document.createElement('img');image.width=entry.width;image.height=entry.height;image.decoding='async';
-   const missing=document.createElement('p');missing.className='editorial-image-error';missing.hidden=true;
-   image.addEventListener('error',()=>{image.hidden=true;missing.hidden=false;});
-   image.src=new URL(entry.image.slice(1),appRoot).href;frame.append(image,missing);
-   const body=document.createElement('figcaption'),line=document.createElement('div');line.className='editorial-cityline';
-   const city=document.createElement('h3'),number=document.createElement('span');number.className='editorial-number';number.textContent=String(index+1).padStart(2,'0');number.setAttribute('aria-hidden','true');line.append(city,number);
-   const context=document.createElement('p'),caption=document.createElement('p'),disclosure=document.createElement('p');context.className='editorial-context';caption.className='editorial-caption';disclosure.className='editorial-disclosure';
-   body.append(line,context,caption,disclosure);figure.append(frame,body);grid.append(figure);cards.push({entry,image,city,context,caption,disclosure,missing});
-  });
- }
- async function load(){
-  const restoreFocus=document.activeElement===retry,id=++requestId;state='loading';localize();const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),6000);
-  try{
-   const response=await fetch(catalogURL,{signal:controller.signal});if(!response.ok)throw Error('Catalog unavailable');
-   const data=await response.json();if(data.version!==1||!Array.isArray(data.references))throw Error('Invalid catalog');
-   const ids=new Set();for(const entry of data.references){if(!entry||typeof entry.id!=='string'||!entry.id.trim()||ids.has(entry.id))throw Error('Invalid IDs');ids.add(entry.id);}
-   const entries=data.references.filter(entry=>entry.assetStatus==='available');
-   for(const entry of entries){
-    if(!['city','context','caption','disclosure'].every(key=>typeof entry[key]==='string'&&entry[key].trim())||entry.imageType!=='ai-generated'||entry.source!=='Created with ChatGPT'||entry.disclosure!=='AI-generated editorial illustration · Created with ChatGPT · Not documentary photography'||!Number.isInteger(entry.width)||entry.width<=0||!Number.isInteger(entry.height)||entry.height<=0||typeof entry.image!=='string'||!/^\/images\/references\/(?:[a-z0-9-]+\/)*[a-z0-9-]+\.(?:jpg|jpeg|png|webp|avif)$/.test(entry.image))throw Error('Invalid reference');
-   }
-   if(id!==requestId)return;render(entries);state=entries.length?'ready':'empty';
-  }catch(error){if(id!==requestId)return;render([]);state='error';}
-  finally{clearTimeout(timer);if(id===requestId){localize();if(restoreFocus){const target=state==='error'?retry:document.querySelector('#editorial-title');if(target!==retry)target.setAttribute('tabindex','-1');target.focus({preventScroll:true});}}}
- }
- retry.addEventListener('click',load);window.addEventListener('visual-edit:languagechange',localize);load();
+<script>(() => {
+	const gridElement = document.querySelector("#editorial-grid"), statusElement = document.querySelector("#editorial-status"), retryElement = document.querySelector("#editorial-retry");
+	if (!gridElement || !statusElement || !retryElement) throw Error("Editorial gallery markup is missing");
+	const grid = gridElement, status = statusElement, retry = retryElement;
+	// Pages preparation scopes this URL. JSON image paths stay canonical; resolve them against the catalog's app root explicitly.
+	const catalogURL = new URL("/data/references.json", location.href), appRoot = new URL("../", catalogURL);
+	let state = "loading", cards = [], requestId = 0;
+	const messages = {
+		loading: "Loading editorial studies…",
+		error: "Editorial studies are unavailable. Try again when connected.",
+		empty: "No editorial studies are available yet."
+	};
+	function localize() {
+		status.hidden = state === "ready";
+		status.textContent = t(messages[state] || "");
+		retry.hidden = state !== "error";
+		retry.textContent = t("Try again");
+		for (const card of cards) {
+			const { entry, image, city, context, caption, disclosure, missing } = card;
+			city.textContent = t(entry.city);
+			context.textContent = t(entry.context);
+			caption.textContent = t(entry.caption);
+			disclosure.textContent = t(entry.disclosure);
+			image.alt = t(entry.city) + ". " + t(entry.caption);
+			missing.textContent = t("Image unavailable. The editorial caption is still available below.");
+		}
+	}
+	function render(entries) {
+		grid.replaceChildren();
+		cards = [];
+		entries.forEach((entry, index) => {
+			const figure = document.createElement("figure");
+			figure.className = "editorial-card";
+			figure.dataset.referenceId = entry.id;
+			const frame = document.createElement("div");
+			frame.className = "editorial-image";
+			frame.style.setProperty("--editorial-ratio", entry.width + " / " + entry.height);
+			const image = document.createElement("img");
+			image.width = entry.width;
+			image.height = entry.height;
+			image.decoding = "async";
+			const missing = document.createElement("p");
+			missing.className = "editorial-image-error";
+			missing.hidden = true;
+			image.addEventListener("error", () => {
+				image.hidden = true;
+				missing.hidden = false;
+			});
+			image.src = new URL(entry.image.slice(1), appRoot).href;
+			frame.append(image, missing);
+			const body = document.createElement("figcaption"), line = document.createElement("div");
+			line.className = "editorial-cityline";
+			const city = document.createElement("h3"), number = document.createElement("span");
+			number.className = "editorial-number";
+			number.textContent = String(index + 1).padStart(2, "0");
+			number.setAttribute("aria-hidden", "true");
+			line.append(city, number);
+			const context = document.createElement("p"), caption = document.createElement("p"), disclosure = document.createElement("p");
+			context.className = "editorial-context";
+			caption.className = "editorial-caption";
+			disclosure.className = "editorial-disclosure";
+			body.append(line, context, caption, disclosure);
+			figure.append(frame, body);
+			grid.append(figure);
+			cards.push({
+				entry,
+				image,
+				city,
+				context,
+				caption,
+				disclosure,
+				missing
+			});
+		});
+	}
+	async function load() {
+		const restoreFocus = document.activeElement === retry, id = ++requestId;
+		state = "loading";
+		localize();
+		const controller = new AbortController(), timer = setTimeout(() => controller.abort(), 6e3);
+		try {
+			const response = await fetch(catalogURL, { signal: controller.signal });
+			if (!response.ok) throw Error("Catalog unavailable");
+			const data = await response.json();
+			if (data.version !== 1 || !Array.isArray(data.references)) throw Error("Invalid catalog");
+			const ids = new Set();
+			for (const entry of data.references) {
+				if (!entry || typeof entry.id !== "string" || !entry.id.trim() || ids.has(entry.id)) throw Error("Invalid IDs");
+				ids.add(entry.id);
+			}
+			const entries = data.references.filter((entry) => entry.assetStatus === "available");
+			for (const entry of entries) {
+				if (![
+					"city",
+					"context",
+					"caption",
+					"disclosure"
+				].every((key) => typeof entry[key] === "string" && String(entry[key]).trim()) || entry.imageType !== "ai-generated" || entry.source !== "Created with ChatGPT" || entry.disclosure !== "AI-generated editorial illustration · Created with ChatGPT · Not documentary photography" || !Number.isInteger(entry.width) || entry.width <= 0 || !Number.isInteger(entry.height) || entry.height <= 0 || typeof entry.image !== "string" || !/^\/images\/references\/(?:[a-z0-9-]+\/)*[a-z0-9-]+\.(?:jpg|jpeg|png|webp|avif)$/.test(entry.image)) throw Error("Invalid reference");
+			}
+			if (id !== requestId) return;
+			render(entries);
+			state = entries.length ? "ready" : "empty";
+		} catch (error) {
+			if (id !== requestId) return;
+			render([]);
+			state = "error";
+		} finally {
+			clearTimeout(timer);
+			if (id === requestId) {
+				localize();
+				if (restoreFocus) {
+					const target = state === "error" ? retry : document.querySelector("#editorial-title");
+					if (target && target !== retry) target.setAttribute("tabindex", "-1");
+					target?.focus({ preventScroll: true });
+				}
+			}
+		}
+	}
+	retry.addEventListener("click", load);
+	window.addEventListener("visual-edit:languagechange", localize);
+	load();
 })();
 </script>
 </body></html>
