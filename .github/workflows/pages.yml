@@ -30,10 +30,6 @@ jobs:
         run: npm run typecheck
       - name: Build the site
         run: npm run build
-      - name: Verify the committed site is reproducible
-        run: |
-          git diff --exit-code -- dist
-          test -z "$(git ls-files --others --exclude-standard -- dist)" || { echo 'The build produced files that are not committed'; exit 1; }
       - name: Locate Chromium
         run: |
           chrome_binary=$(command -v google-chrome)
@@ -73,6 +69,10 @@ jobs:
       - uses: actions/setup-node@v5
         with:
           node-version: '24'
+          cache: npm
+      - run: npm ci
+      - name: Build the site
+        run: npm run build
       - name: Prepare GitHub Pages files
         run: node scripts/prepare-pages.mjs "$RUNNER_TEMP/reference-pages" /the-reference-edit/ "$GITHUB_SHA"
       - name: Publish the Pages source branch
