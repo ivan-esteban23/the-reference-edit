@@ -1,0 +1,19 @@
+{
+  "name": "the-reference-edit",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "The Reference Edit visual research website",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "typecheck": "tsc --noEmit",
+    "test": "node scripts/build.mjs && node tests/site.mjs && node tests/editorial-gallery.mjs && node tests/chooser.mjs && node tests/collection.mjs && node tests/recently-viewed.mjs && node tests/personal-sources.mjs && node tests/personal-backup.mjs && node tests/collection-backup.mjs && node tests/collection-folders.mjs && node tests/source-notes.mjs && node tests/service-worker.mjs && node --test tests/worker-storage.mjs && node tests/pages.mjs"
+  },
+  "devDependencies": {
+    "@types/node": "^24.10.1",
+    "typescript": "^7.0.2"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}
