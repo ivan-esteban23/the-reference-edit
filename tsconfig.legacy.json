@@ -6,5 +6,5 @@
     "exactOptionalPropertyTypes": false,
     "noImplicitOverride": false
   },
-  "include": ["src/ts/directory.ts", "src/ts/collection.ts"]
+  "include": ["src/ts/directory.ts", "src/ts/collection.ts", "src/ts/i18n-es.ts", "src/ts/i18n-zh-hans.ts", "src/ts/i18n-zh-hant.ts", "src/ts/i18n-ja.ts", "src/ts/i18n-ko.ts", "src/ts/i18n.ts"]
 }
