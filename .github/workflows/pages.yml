@@ -27,11 +27,13 @@ jobs:
           cache: npm
       - run: npm ci
       - name: Type check
-        run: npx tsc --noEmit
+        run: npm run typecheck
       - name: Build the site
         run: npm run build
       - name: Verify the committed site is reproducible
-        run: git diff --exit-code -- dist
+        run: |
+          git diff --exit-code -- dist
+          test -z "$(git ls-files --others --exclude-standard -- dist)" || { echo 'The build produced files that are not committed'; exit 1; }
       - name: Locate Chromium
         run: |
           chrome_binary=$(command -v google-chrome)
@@ -46,6 +48,7 @@ jobs:
       - run: node tests/collection-backup.mjs
       - run: node tests/collection-folders.mjs
       - run: node tests/source-notes.mjs
+      - run: node tests/storage-compat.mjs
       - run: node tests/service-worker.mjs
       - run: node --test tests/worker-storage.mjs
       - run: node tests/pages.mjs

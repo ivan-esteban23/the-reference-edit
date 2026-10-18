@@ -1,12 +1,13 @@
 # Local regression checks
 
-The maintained site is the buildless `dist/` directory. No installation or build step is required. These tests use Node's built-in APIs and a local Chromium executable; they create isolated temporary browser profiles and remove them afterward.
+The authored source is `src/`; `dist/` is the built, committed site these tests serve. Build it before running any suite: `npm ci && npm run build`. `npm run typecheck` checks every TypeScript source, and `npm test` runs the build, the type check and the suites in order. The tests themselves use Node's built-in APIs and a local Chromium executable; they create isolated temporary browser profiles and remove them afterward.
 
 [Deployment instructions](../DEPLOYMENT.md) describe the GitHub workflow and Pages snapshot preparation. PRs run tests without publishing; successful test runs on `main` prepare the hosted paths, update the Pages source branch and request a Pages build.
 
 From the repository root:
 
 ```sh
+npm run build
 node tests/service-worker.mjs
 node tests/site.mjs
 node tests/editorial-gallery.mjs
@@ -20,6 +21,7 @@ node tests/collection-backup.mjs
 node tests/collection-folders.mjs
 node tests/source-notes.mjs
 node tests/pages.mjs
+node tests/storage-compat.mjs
 ```
 
 For a focused interaction/keyboard rerun, use `node tests/site.mjs --interactions-only`; that mode explicitly omits the layout matrix.
@@ -88,6 +90,8 @@ A “Recently viewed” section in My collection lists up to eight curated sourc
 Collection folders group saved directory cards and personal sources into named folders from My collection. Names are plain text, at most 60 characters, and stored separately under `reference-edit-collection-folders-v1` (`{version:1,folders:[{id,name,directory:[url],personal:[id]}]}`); favorites, notes and personal records keep their existing keys. Each collection card gains a folder select with live counts, and the folder filter narrows both kinds and combines with the shared search and kind choices. Removing or deleting a folder never deletes or unfavorites a source; membership is simply dropped. Duplicate names are rejected case-insensitively, corrupt storage hides the folder section with a warning until repaired, and failed writes keep the previous list. Version 3 complete backups include folder names and memberships without local ids; imports accept versions 1–3, cap at 200 folders on import, merge same-name folders case-insensitively, keep existing placements, remap personal ids and participate in the existing rollback/retry handling.
 
 `collection-folders.mjs` runs eighteen functional check groups and 96 folder layout/language/theme/text-size cases. It covers dialog create/rename/delete with focus restoration and case-insensitive duplicates, per-card filing/unfiling with live counts, filter/search/kind combinations, delete semantics, inert user text, corrupt/quota storage, cross-tab refresh, translations, version 3 export and import (fresh and merged, including rolled-back and retried folder-write failures), version 1/2 compatibility and offline create/file/filter/delete. Current capture: `/tmp/reference-folders-results/mobile.png`.
+
+Cross-version storage compatibility lives in `storage-compat.mjs`. It boots the pre-migration site (commit `91f89ec`, pinned as `PREMIGRATION_REVISION`) and the built site in turn, seeds all seven stored keys in the shape the published site writes — favorites, theme, language, personal sources, directory notes, collection folders and recently viewed — and asserts both builds render the same favorites, collection cards, note text, folder rows, history, theme and language, keep every corruption warning hidden, leave the seven stored strings byte-identical across two boots and raise no page exceptions. Overriding `PREMIGRATION_REVISION` compares against another revision.
 
 Research guides consolidate reading, project routes, workflow and the reference record into `#routes`. Three native disclosures cover inspiration, topic research and moodboards; `#notes` retains one shared record template. Historic `#workflow` and `#landscape` fragments open their matching guides, and native keyboard controls/print expansion are covered by the site suite. The 96-case layout matrix includes expanded guide headings and body copy. Pages checks also open the moodboard guide offline from the collection view.
 

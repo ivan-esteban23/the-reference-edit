@@ -1,8 +1,18 @@
 # Publishing the website
 
-The maintained application is the buildless `dist/` directory. GitHub Pages serves it at:
+The authored source is `src/` (HTML template, stylesheet, TypeScript scripts, i18n data, assets). `dist/` is the built site that GitHub Pages serves, committed to the repository so the publishing job needs no toolchain:
 
 https://ivan-esteban23.github.io/the-reference-edit/
+
+## Building
+
+```sh
+npm ci
+npm run typecheck
+npm run build
+```
+
+`scripts/build.mjs` inlines the stylesheet and every TypeScript script into a single self-contained `dist/index.html`; no bundled chunks are produced on purpose, because the Pages preparation and the worker precache list only understand the single-file layout (see `Pages path handling` below). The test job runs `git diff --exit-code -- dist` after `npm run build`, so a committed `dist/` that the build cannot reproduce fails the pull request. Never edit `dist/index.html` by hand: change `src/` and rebuild. `dist/sw.js` is still copied verbatim from `src/sw.js`.
 
 The Pages setting remains **Deploy from a branch → `preview/phone` → `/ (root)`**. Despite its historical name, that branch is generated deployment output. Do not merge it into `main` or edit the generated files manually.
 

@@ -30,8 +30,12 @@ async function load(file) {
   const code = await readFile(path.join(source, file), 'utf8');
   if (!file.endsWith('.ts')) return code;
   // Transform only: bundling would rename top-level bindings, and these files share one
-  // global lexical scope exactly like the classic <script> tags they replace.
-  const {code: js} = await transformWithOxc(code, file, {loader: 'ts'});
+  // global lexical scope exactly like the classic <script> tags they replace. OXC picks the
+  // TypeScript loader from the .ts extension.
+  const {code: js} = await transformWithOxc(code, file);
+  if (/^\s*(?:interface|type)\s|:\s*(?:string|number|boolean)\s*[;=)]/m.test(js)) {
+    throw new Error(`${file} still contains TypeScript syntax after transformation`);
+  }
   return js;
 }
 
@@ -96,9 +100,9 @@ if (html.includes('data-src=')) {
   throw new Error('An inline placeholder survived the build');
 }
 
-const built = await readdir(output, {recursive: true});
+const built = await readdir(output, {recursive: true, withFileTypes: true});
 await rm(published, {recursive: true, force: true});
 await cp(output, published, {recursive: true});
 await rm(staging, {recursive: true, force: true});
-console.log(`Built dist/: ${built.length} files, ${records.length} source records, `
+console.log(`Built dist/: ${built.filter(entry => entry.isFile()).length} files, ${records.length} source records, `
   + `${inlined.styles} inlined stylesheets, ${inlined.scripts} inlined scripts.`);

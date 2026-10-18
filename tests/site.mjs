@@ -67,16 +67,18 @@ for (const match of html.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script>/gi)) {
 }
 const result = {sourceRecords: 58, recordsByteIdenticalExceptImageURLs: true, imagesByteIdentical: embedded.length, fontsByteIdentical: embeddedFonts.length, scriptsCompiled: scripts, layouts: [], checks: []};
 {
-  const marker = 'translations={', start = html.indexOf(marker);
-  assert.ok(start > 0, 'Translations object missing');
-  let depth = 0, end = start + 'translations='.length, inString = false, quote = '', escaped = false;
+  // The bundle reformats source text, so locate the assignment rather than an exact literal.
+  const marker = /translations\s*=\s*(?=\{)/.exec(html);
+  assert.ok(marker, 'Translations object missing');
+  const start = marker.index, body = marker.index + marker[0].length;
+  let depth = 0, end = body, inString = false, quote = '', escaped = false;
   for (; end < html.length; end++) {
     const character = html[end];
     if (inString) {if (escaped) {escaped = false; continue;} if (character === '\\') {escaped = true; continue;} if (character === quote) inString = false; continue;}
     if (character === '"' || character === "'") {inString = true; quote = character; continue;}
     if (character === '{') depth++; else if (character === '}' && --depth === 0) {end++; break;}
   }
-  const translations = JSON.parse(html.slice(start + 'translations='.length, end));
+  const translations = JSON.parse(html.slice(body, end));
   const outside = html.slice(0, start) + html.slice(end) + references.filter(entry=>entry.assetStatus==='available').flatMap(entry=>[entry.city,entry.context,entry.caption,entry.disclosure]).join('\n');
   const locales = Object.keys(translations), base = new Set(Object.keys(translations[locales[0]]));
   for (const locale of locales) {

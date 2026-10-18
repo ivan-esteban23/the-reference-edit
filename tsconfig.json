@@ -1,4 +1,6 @@
 {
+  // Files listed here are checked under the strict settings below. The remaining legacy
+  // scripts live in tsconfig.legacy.json; a file moves here once it is fully typed.
   "compilerOptions": {
     "target": "ES2022",
     "module": "ESNext",
@@ -15,5 +17,12 @@
     "skipLibCheck": true,
     "types": ["node"]
   },
-  "include": ["scripts/build.mjs", "src/ts/**/*.ts", "vite.config.ts"]
+  "include": [
+    "scripts/build.mjs",
+    "vite.config.ts",
+    "src/ts/globals.d.ts",
+    "src/ts/manifest-inject.ts",
+    "src/ts/theme-language.ts",
+    "src/ts/gallery.ts"
+  ]
 }
