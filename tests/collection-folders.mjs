@@ -63,11 +63,11 @@ try{
  await openDialog();await submitFolder('editorial');
  view=await folderView();assert.equal(view.error,'A folder with this name already exists.');assert.equal(view.dialogOpen,true);
  await submitFolder('   ');assert.equal((await folders()).folders.length,2);
- await click('#folder-cancel');assert.equal((await folders()).folders.length,2);
+ await click('#folder-cancel');await pause(100);assert.equal((await folders()).folders.length,2);
  check('Duplicate names are rejected case-insensitively, whitespace-only names are refused and the stored list stays intact');
 
  const editorialId=(await folders()).folders[0].id;
- await click('.folder-row [data-folder-action=rename]');
+ await click('.folder-row [data-folder-action=rename]');await pause(50);
  assert.equal(await ev("document.querySelector('#folder-dialog-title').textContent"),'Rename folder');
  assert.equal(await ev("document.querySelector('#folder-name').value"),'Editorial');
  await submitFolder('Editorial picks');
@@ -105,7 +105,7 @@ try{
  await ev(`document.querySelector('#folder-filter').value=${JSON.stringify((await folders()).folders[1].id)};document.querySelector('#folder-filter').dispatchEvent(new Event('change'))`);
  await click('.folder-row:nth-child(2) [data-folder-action=delete]');
  view=await folderView();assert.equal(view.deleteOpen,true);assert.equal(view.deleteName,'Archive');
- await click('#folder-delete-cancel');assert.equal((await folders()).folders.length,2);
+ await click('#folder-delete-cancel');await pause(50);assert.equal((await folders()).folders.length,2);
  await click('.folder-row:nth-child(2) [data-folder-action=delete]');await click('#folder-delete-confirm');
  data=await folders();assert.equal(data.folders.length,1);assert.equal(await ev(`JSON.parse(localStorage.getItem(${JSON.stringify(personalKey)})).sources.length`),2);
  assert.deepEqual(JSON.parse(await ev(`localStorage.getItem(${JSON.stringify(favoriteKey)})`)),urls.slice(0,3));
@@ -126,7 +126,7 @@ try{
  view=await folderView();assert.equal(view.warning,'Saved folders could not be read. Existing browser data has not been changed.');assert.equal(view.filterHidden,true);
  await openDialog();await submitFolder('Cannot save');
  view=await folderView();assert.equal(view.error,failureText);assert.equal(view.dialogOpen,true);assert.equal(await ev(`localStorage.getItem(${JSON.stringify(foldersKey)})`),'{broken');
- await click('#folder-cancel');
+ await click('#folder-cancel');await pause(50);
  check('Corrupt folder storage hides folders with a warning and blocks writes until repaired');
 
  await seed({favorites:urls.slice(0,2),sources:[source('p-one')],folders:[{id:'folder-a',name:'Editorial',directory:[],personal:[]}]});
