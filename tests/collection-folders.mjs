@@ -34,7 +34,7 @@ const folderView=()=>ev(`({warning:document.querySelector('#folder-warning').hid
 const listView=()=>ev(`({directory:[...document.querySelectorAll('#personal-list .collection-source')].map(c=>c.dataset.directoryUrl),personal:[...document.querySelectorAll('#personal-list .personal-source')].map(c=>c.dataset.personalId),emptyText:document.querySelector('#personal-list>p')?document.querySelector('#personal-list>p').textContent:null})`);
 const openDetails=()=>ev("document.querySelector('#collection-folders').open=true");
 const openDialog=async()=>{await click('#folder-add');assert.equal(await ev("document.querySelector('#folder-dialog').open"),true);};
-const submitFolder=async name=>{await ev(`(()=>{const input=document.querySelector('#folder-name');input.value=${JSON.stringify(name)};input.dispatchEvent(new Event('input'));document.querySelector('#folder-save').click();})()`);await pause(50);};
+const submitFolder=async name=>{await ev(`(()=>{const input=document.querySelector('#folder-name');input.value=${JSON.stringify(name)};input.dispatchEvent(new Event('input'));document.querySelector('#folder-save').click();})()`);await pause(100);};
 const assign=async(selector,index,id)=>ev(`(()=>{const select=[...document.querySelectorAll(${JSON.stringify(selector)}+' .folder-select')][${index}];select.value=${JSON.stringify(id)};select.dispatchEvent(new Event('change'));})()`);
 const failureText='Could not save folder changes. Your collection has not changed. Check browser storage and retry.';
 try{

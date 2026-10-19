@@ -136,7 +136,7 @@ try{
   mode='unsafe-text';await failure.navigate('/?scenario=unsafe-text');await failure.until("document.querySelectorAll('.editorial-card').length===3");
   assert.equal(await failure.evaluate("document.querySelector('.editorial-caption').textContent"),'<img src=x onerror="window.galleryInjected=true">');
   assert.equal(await failure.evaluate("!!window.galleryInjected||!!document.querySelector('.editorial-caption img')"),false);
-  mode='missing-image';await failure.navigate('/?scenario=missing-image');await failure.until("!document.querySelector('.editorial-image-error').hidden");
+  mode='missing-image';await failure.navigate('/?scenario=missing-image');await failure.until("document.querySelector('.editorial-image-error')&&!document.querySelector('.editorial-image-error').hidden");
   assert.ok(await failure.evaluate("document.querySelector('.editorial-card img').hidden&&!!document.querySelector('.editorial-card .editorial-caption').textContent&&!!document.querySelector('.editorial-card .editorial-disclosure').textContent"));
   assert.deepEqual(failure.exceptions,[]);
   check('Catalog failures/timeouts, invalid paths/disclosures/IDs, retry, empty/pending entries, inert metadata and image-404 placeholders are handled without page exceptions');
