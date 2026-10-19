@@ -582,7 +582,7 @@ summary:hover{background:var(--soft)}
  .hero-actions a{font-size:var(--text-label);letter-spacing:.035em;text-decoration:none}
  .hero-actions a:hover{text-decoration:underline}
  .cover-kicker{font-size:.6875rem;letter-spacing:.09em;gap:8px 18px}
- .cover-image img{filter:grayscale(1);object-fit:cover}
+ .cover-image img{filter:grayscale(1);object-fit:cover;aspect-ratio:4/5;object-position:center}
  .cover-image figcaption{display:flex;justify-content:space-between;gap:12px;padding-top:12px;font-size:.6875rem;letter-spacing:.07em;text-transform:uppercase}
  .section-navigation{border-top:0;border-bottom:1px solid var(--line);padding-block:6px}
  .section-navigation>summary{font-size:var(--text-label);letter-spacing:.08em;text-transform:uppercase}

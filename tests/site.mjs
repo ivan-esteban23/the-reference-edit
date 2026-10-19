@@ -10,21 +10,23 @@ const before = gitFile(baseline, 'dist/index.html').toString();
 const records = source => [...source.matchAll(/<article\b[^>]*class="source"[\s\S]*?<\/article>/g)].map(m => m[0]);
 // Image URLs are the only permitted source-record change: verify every original byte first.
 const originalImages = [...before.matchAll(/data:image\/([^;]+);base64,([A-Za-z0-9+/=]+)/g)];
-// The original favicon is intentionally replaced; preserve every cover/source image.
+// The original favicon and cover are intentionally replaced; preserve every source image.
 assert.equal(originalImages.length, 60);
 assert.equal(originalImages[0][1], "svg+xml");
 assert.equal(createHash("sha256").update(Buffer.from(originalImages[0][2], "base64")).digest("hex").slice(0,16), "85cfa79ee7373f6f");
-const embedded = originalImages.slice(1);
+const embeddedSources = originalImages.slice(2);
 const extracted = [...html.matchAll(/images\/image-[a-f0-9]{16}\.(?:png|jpg|gif|ico|svg)/g)];
-assert.equal(embedded.length, 59); assert.equal(extracted.length, embedded.length);
+assert.equal(extracted.length, 59);
 assert.ok(!html.includes('data:image/'), 'An image remains embedded');
 const extensions = {'svg+xml':'svg',jpeg:'jpg',png:'png','x-icon':'ico',gif:'gif'};
+const coverUrl = extracted[0][0];
+assert.equal(coverUrl, `images/image-${createHash('sha256').update(files.get('/' + coverUrl)).digest('hex').slice(0,16)}.jpg`);
 let restored = html;
-for (let i = 0; i < embedded.length; i++) {
-  const original = Buffer.from(embedded[i][2], 'base64'), url = extracted[i][0];
-  assert.equal(url, `images/image-${createHash('sha256').update(original).digest('hex').slice(0,16)}.${extensions[embedded[i][1]]}`);
+for (let i = 0; i < embeddedSources.length; i++) {
+  const original = Buffer.from(embeddedSources[i][2], 'base64'), url = extracted[i + 1][0];
+  assert.equal(url, `images/image-${createHash('sha256').update(original).digest('hex').slice(0,16)}.${extensions[embeddedSources[i][1]]}`);
   assert.deepEqual(files.get('/' + url), original, `Image bytes changed: ${url}`);
-  restored = restored.replace(url, embedded[i][0]);
+  restored = restored.replace(url, embeddedSources[i][0]);
 }
 // assets() walks every dist file, including documentation and folder markers.
 const imageAssets = [...files.keys()].filter(key=>key.startsWith('/images/')&&/\.(?:avif|bmp|gif|ico|jpe?g|png|svg|webp)$/i.test(key));
@@ -67,7 +69,7 @@ for (const match of html.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script>/gi)) {
   if (/application\//.test(match[1])) continue;
   new vm.Script(match[2]); scripts++;
 }
-const result = {sourceRecords: 58, recordsByteIdenticalExceptImageURLs: true, imagesByteIdentical: embedded.length, fontsByteIdentical: embeddedFonts.length, scriptsCompiled: scripts, layouts: [], checks: []};
+const result = {sourceRecords: 58, recordsByteIdenticalExceptImageURLs: true, imagesByteIdentical: embeddedSources.length, fontsByteIdentical: embeddedFonts.length, scriptsCompiled: scripts, layouts: [], checks: []};
 {
   // The tables live in src/ts/i18n-*.ts, one per locale, as JSON-compatible object literals.
   const tables = {es:'i18nEs','zh-Hans':'i18nZhHans','zh-Hant':'i18nZhHant',ja:'i18nJa',ko:'i18nKo'};
