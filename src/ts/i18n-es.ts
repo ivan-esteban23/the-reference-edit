@@ -531,6 +531,8 @@ const i18nEs = {
   "Photography": "Fotografía",
   "Fashion": "Moda",
   "Architecture": "Arquitectura",
-  "Graphic Design": "Diseño gráfico"
+  "Graphic Design": "Diseño gráfico",
+  "Other editions": "Otras ediciones",
+  "Read issue 02: The Portrait Edit": "Leer The Portrait Edit número 02"
 };
 type TKey = keyof typeof i18nEs;

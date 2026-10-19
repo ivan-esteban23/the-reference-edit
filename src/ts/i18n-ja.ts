@@ -530,5 +530,7 @@ const i18nJa: Record<TKey, string> = {
   "Photography": "写真",
   "Fashion": "ファッション",
   "Architecture": "建築",
-  "Graphic Design": "グラフィックデザイン"
+  "Graphic Design": "グラフィックデザイン",
+  "Other editions": "その他の号",
+  "Read issue 02: The Portrait Edit": "The Portrait Edit 第 02 号を読む"
 };

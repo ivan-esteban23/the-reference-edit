@@ -530,5 +530,7 @@ const i18nKo: Record<TKey, string> = {
   "Photography": "사진",
   "Fashion": "패션",
   "Architecture": "건축",
-  "Graphic Design": "그래픽 디자인"
+  "Graphic Design": "그래픽 디자인",
+  "Other editions": "다른 호",
+  "Read issue 02: The Portrait Edit": "The Portrait Edit 호 02 읽기"
 };

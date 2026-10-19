@@ -530,5 +530,7 @@ const i18nZhHant: Record<TKey, string> = {
   "Photography": "攝影",
   "Fashion": "時尚",
   "Architecture": "建築",
-  "Graphic Design": "平面設計"
+  "Graphic Design": "平面設計",
+  "Other editions": "其他刊次",
+  "Read issue 02: The Portrait Edit": "閱讀 The Portrait Edit 第 02 期"
 };
