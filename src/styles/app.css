@@ -564,6 +564,11 @@ summary:hover{background:var(--soft)}
   --strong:#f1eee7;--focus:#ed8176;--link:#ed8176;--on-strong:#151513;--card-hover:#252520;
   --glass:rgba(21,21,19,.78);
  }
+ @media(prefers-contrast:more){
+  :root{--ink:#000;--muted:#3a3834;--line:#706b62;--control-line:#524d45;--focus:#8a1a14}
+  :root[data-theme="dark"]{--ink:#fff;--muted:#dedad2;--line:#9c978e;--control-line:#beb9af;--focus:#ffa49c}
+  :focus-visible{outline-width:3px;outline-offset:3px}
+ }
  body{line-height:1.65}
  .masthead{padding-block:18px;gap:16px}
  .masthead>span,.footer-wordmark{font-family:var(--serif);font-size:clamp(1.25rem,1rem + .7vw,1.65rem);letter-spacing:-.035em}
