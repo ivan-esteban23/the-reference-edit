@@ -4263,8 +4263,13 @@ function buildFavoriteMarkdown() {
 	}
 	return lines.join("\n");
 }
-document.querySelector("#export-favorites").addEventListener("click", () => {
+document.querySelector("#export-favorites").addEventListener("click", (event) => {
 	if (!favoriteKeys.size) return;
+	if (event.shiftKey || event.altKey) {
+		event.preventDefault();
+		copyLink(buildFavoriteMarkdown());
+		return;
+	}
 	const blob = new Blob([buildFavoriteMarkdown()], { type: "text/markdown;charset=utf-8" }), url = URL.createObjectURL(blob), a = document.createElement("a");
 	a.href = url;
 	a.download = "the-reference-edit-collection.md";
@@ -4409,6 +4414,20 @@ window.addEventListener("keydown", (event) => {
 		event.preventDefault();
 		if (document.querySelector("dialog[open]")) return;
 		paletteOpen();
+	} else if (event.key === "/the-reference-edit/" && !event.metaKey && !event.ctrlKey && !event.altKey && !event.shiftKey) {
+		const active = document.activeElement, isInput = active && (active.tagName === "INPUT" || active.tagName === "TEXTAREA" || active.tagName === "SELECT" || active.isContentEditable);
+		if (!isInput && !document.querySelector("dialog[open]") && !collectionOpen) {
+			event.preventDefault();
+			search.focus();
+			search.select();
+		}
+	}
+});
+search.addEventListener("keydown", (event) => {
+	if (event.key === "Escape" && search.value) {
+		event.preventDefault();
+		search.value = "";
+		update();
 	}
 });
 // Fixed editorial choices reference the maintained catalog rather than copying records.
