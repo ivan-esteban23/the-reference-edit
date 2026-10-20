@@ -35,6 +35,7 @@ jobs:
           chrome_binary=$(command -v google-chrome)
           echo "CHROMIUM=$chrome_binary" >> "$GITHUB_ENV"
       - run: node tests/site.mjs
+      - run: node tests/responsive.mjs
       - run: node tests/editorial-gallery.mjs
       - run: node tests/chooser.mjs
       - run: node tests/collection.mjs
