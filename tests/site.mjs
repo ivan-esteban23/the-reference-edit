@@ -175,6 +175,39 @@ try {
   await ev("document.querySelector('#reset').click()");
   check('Five curated topics combine with search/country, support keyboard activation, URL reload, reset, removal and country navigation');
 
+  // Removing a chip must never silently clear another active filter.
+  await ev("document.querySelector('[data-topic=photography]').click()");
+  await search('IGNANT');
+  assert.equal((await visibleURLs()).length,1);
+  await ev("document.querySelector('[data-remove-filter=search]').click()");
+  assert.equal((await visibleURLs()).length,5,'Removing search must retain the five Photography sources');
+  assert.equal(await ev("document.querySelector('[data-topic=photography]').getAttribute('aria-pressed')"),'true');
+  assert.equal(await ev("location.hash"),'#directory?topic=photography');
+  await navigate('',true);
+  assert.equal((await visibleURLs()).length,5,'Photography survives reloading the remaining filter URL');
+  const chipState=()=>ev(`({topic,search:search.value,category,country:countryFilter.value,region:region.value,access:accessFilter.value,favorites:favoritesOnly})`);
+  const chipTarget=await ev(`(()=>{const c=cards.find(c=>c.querySelector('h3').textContent.includes('IGNANT'));c.querySelector('.favorite-source').click();return {category:c.dataset.category,country:c.dataset.country,region:c.dataset.region,access:accessByCard.get(c)};})()`);
+  for(const removed of ['search','category','country','region','access','favorites','topic']){
+    await ev("document.querySelector('#reset').click();document.querySelector('[data-topic=photography]').click()");
+    await search('IGNANT');
+    for(const [id,value] of [['#category-filter',chipTarget.category],['#country-filter',chipTarget.country],['#region',chipTarget.region],['#access-filter',chipTarget.access]])await select(id,value);
+    await ev("document.querySelector('#favorites-view').click()");
+    const expected=await chipState();
+    assert.equal(await ev('activeFilterCount()'),7);
+    assert.equal((await visibleURLs()).length,1);
+    expected[removed]=removed==='favorites'?false:['topic','search'].includes(removed)?'':'All';
+    await ev(`document.querySelector('[data-remove-filter=${removed}]').click()`);
+    assert.deepEqual(await chipState(),expected,`Removing ${removed} changed another filter`);
+    assert.equal(await ev('activeFilterCount()'),6);
+    assert.equal(await ev("document.querySelector('#filter-chips').children.length"),6);
+    assert.ok(await ev("document.activeElement.matches('#filter-chips button')"),'Focus stays on a remaining chip');
+    assert.deepEqual(await ev("[...new URLSearchParams(location.hash.split('?')[1]).entries()].sort()"),Object.entries({topic:expected.topic,q:expected.search,category:expected.category,region:expected.region,access:expected.access,country:expected.country}).filter(([,v])=>v&&v!=='All').sort());
+    assert.equal((await visibleURLs()).length,1);
+  }
+  await ev("document.querySelector('#reset').click();cards.find(c=>c.querySelector('h3').textContent.includes('IGNANT')).querySelector('.favorite-source').click()");
+  assert.equal((await visibleURLs()).length,58);
+  check('Each of seven chips clears only itself; Photography + IGNANT retains five sources, URL reload, counts and focus');
+
   assert.equal(await ev("document.querySelectorAll('.research-route').length"),3);
   assert.ok(await ev("[...document.querySelectorAll('#routes details')].every(d=>!d.open)"));
   // Exercise disclosures while measuring; a collapsed page can hide overflow bugs.
