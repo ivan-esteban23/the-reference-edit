@@ -10,6 +10,7 @@ From the repository root:
 npm run build
 node tests/service-worker.mjs
 node tests/site.mjs
+node tests/responsive.mjs
 node tests/editorial-gallery.mjs
 node tests/chooser.mjs
 node --test tests/worker-storage.mjs
@@ -25,6 +26,14 @@ node tests/storage-compat.mjs
 ```
 
 For a focused interaction/keyboard rerun, use `node tests/site.mjs --interactions-only`; that mode explicitly omits the layout matrix.
+
+`responsive.mjs` adds a bounded 41-case width/readability matrix using the same dependency-free CDP harness. It checks CSS widths 360, 375, 393, 412, 430 and 440; 768, 800, 834, 924, 1024, 1180, 1280, 1366 and 1480; 1470, 1512, 1536, 1710 and 1728; and 1920, 2560, 3440, 3840, 5120, 6016 and 7680. Monitor viewport heights are respectively 1080, 1440, 1440, 2160, 2880, 3384 and 4320 CSS pixels. Additional widths exercise both sides of 639/640, 767/768, 1023/1024, 1279/1280 and 1535/1536 (existing matrix entries supply the repeated boundary widths).
+
+The responsive suite removes page-level `overflow-x` safety before measuring actual element bounds and document scroll width, so hiding a protruding element cannot make the check pass. Legitimate local horizontal scrollers remain allowed, but their container must fit the viewport. Expanded source disclosures are included. Assertions cover the 1440–1920px desktop content cap, one/two/three directory columns below 768 / from 768 / from 1280 CSS pixels, 48×48px key actions, minimum 16px source-purpose and 13px metadata text, hero copy/portrait overlap, hero text clipping and proportional portrait allocation. Intentional cover artwork cropping is preserved; native image aspect ratio is not required. Large tablets and laptops can have overlapping viewport widths, so layout expectations follow width rather than device names.
+
+Four representative widths (360, 834, 1470 and 3840) also use 200% root font sizing. This exercises enlarged text, not browser zoom. Separate paired DPR 1/2 cases hold 393px and 1512px CSS viewports constant and assert unchanged content width, heading size and columns: device pixels and CSS pixels are not interchangeable. Mobile checks use real CDP Tab/Escape events, accessible dialog names, modal background-focus exclusion, target sizes and focus restoration. A chip regression removes country without clearing the independent region/topic filters and checks that chips do not widen the document. The suite does not emulate Safari, physical touch hardware, browser zoom or OS display scaling. JSON results use `responsive.json` in the normal results directory.
+
+On machines whose inherited temporary path is too long for Chromium's Unix socket, use `TMPDIR=/tmp node tests/responsive.mjs` (or `TMPDIR=/tmp npm test`).
 
 The shared browser harness allows up to 30 seconds for the initial DevTools port file on a cold runner. A spawn error or early process exit fails promptly, reporting the selected executable, error/exit status and the last 8 KB of browser stderr. Non-missing-file errors while reading readiness information are surfaced rather than swallowed. Application assertions, navigation timeouts and worker deadlines remain unchanged; a failed browser launch still fails the suite. CI selects its installed Google Chrome through `CHROMIUM`; local runs default to Chromium.
 
