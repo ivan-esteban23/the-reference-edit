@@ -4122,9 +4122,6 @@ function refreshFavorites() {
 	});
 	document.querySelector("#favorites-count").textContent = String(favoriteKeys.size);
 	document.querySelector("#mobile-saved-count").textContent = String(favoriteKeys.size);
-	document.querySelector("#mobile-saved").setAttribute("aria-pressed", String(collectionOpen));
-	document.querySelector("#mobile-directory").setAttribute("aria-pressed", String(!collectionOpen));
-	document.querySelector("#open-collection").setAttribute("aria-pressed", String(collectionOpen));
 	document.querySelector(".collection-view").hidden = !favoritesOnly;
 	document.querySelector("#collection-summary").textContent = t("{visible} of {saved} saved sources shown.").replace("{visible}", cards.filter((c) => !c.hidden).length).replace("{saved}", favoriteKeys.size);
 	document.querySelector("#show-all-saved").disabled = !favoriteKeys.size;
@@ -4173,6 +4170,9 @@ function showCollection(open, focus = true) {
 	collectionOpen = open;
 	document.body.classList.toggle("collection-mode", open);
 	document.querySelector("#my-sources").hidden = !open;
+	document.querySelector("#mobile-saved").setAttribute("aria-pressed", String(open));
+	document.querySelector("#mobile-directory").setAttribute("aria-pressed", String(!open));
+	document.querySelector("#open-collection").setAttribute("aria-pressed", String(open));
 	if (focus) {
 		const target = document.querySelector(open ? "#personal-title" : "#directory");
 		target.setAttribute("tabindex", "-1");
