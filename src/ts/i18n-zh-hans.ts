@@ -532,5 +532,11 @@ const i18nZhHans: Record<TKey, string> = {
   "Architecture": "建筑",
   "Graphic Design": "平面设计",
   "Other editions": "其他刊次",
-  "Read issue 02: The Portrait Edit": "阅读 The Portrait Edit 第 02 期"
+  "Read issue 02: The Portrait Edit": "阅读 The Portrait Edit 第 02 期",
+  "Save source images offline": "离线保存来源图片",
+  "Source logos load when visited. Save them here for offline reference.": "来源标志会在访问时加载。保存到此设备后即可离线查看。",
+  "Saving source images… {saved} of {total}": "正在保存来源图片…{total} 张中的 {saved} 张",
+  "Offline images ready: {saved} saved, {failed} unavailable.": "离线图片已就绪：已保存 {saved} 张，{failed} 张不可用。",
+  "Open the installed app online once, then try again.": "请先在线打开一次已安装的应用，然后重试。",
+  "Source images saved offline": "来源图片已保存，可离线查看"
 };

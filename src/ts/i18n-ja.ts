@@ -532,5 +532,11 @@ const i18nJa: Record<TKey, string> = {
   "Architecture": "建築",
   "Graphic Design": "グラフィックデザイン",
   "Other editions": "その他の号",
-  "Read issue 02: The Portrait Edit": "The Portrait Edit 第 02 号を読む"
+  "Read issue 02: The Portrait Edit": "The Portrait Edit 第 02 号を読む",
+  "Save source images offline": "ソース画像をオフライン用に保存",
+  "Source logos load when visited. Save them here for offline reference.": "ソース画像は閲覧時に読み込まれます。ここで保存するとオフラインでも参照できます。",
+  "Saving source images… {saved} of {total}": "ソース画像を保存中… {total} 件中 {saved} 件",
+  "Offline images ready: {saved} saved, {failed} unavailable.": "オフライン画像を保存しました：{saved} 件、利用不可 {failed} 件。",
+  "Open the installed app online once, then try again.": "インストールしたアプリをオンラインで一度開いてから、もう一度お試しください。",
+  "Source images saved offline": "ソース画像をオフライン保存しました"
 };

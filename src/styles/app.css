@@ -749,3 +749,5 @@ summary:hover{background:var(--soft)}
    compact three-column rule, not be overwritten by it. */
 @container(max-width:20rem){.controls{grid-template-columns:minmax(0,1fr)}.controls #filter-toggle,.controls #palette-open{width:100%}}
 @media print{.cross-nav{display:none!important}}
+
+.offline-images{display:flex;align-items:center;gap:.75rem;flex-wrap:wrap;margin:0 0 1rem;padding:.75rem 1rem;border:1px solid var(--line);border-radius:.75rem;background:var(--surface)}.offline-images button{min-height:44px}.offline-images [role=status]{font-size:.875rem;color:var(--muted)}

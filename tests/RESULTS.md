@@ -299,3 +299,9 @@ Machine-readable results: `/tmp/reference-regression-results/site.json`, `/tmp/r
 ## Limits
 
 Chromium on localhost, using real historical/current assets and simulated host-style redirects. No production-origin deployment or migration, physical-device PWA installation, full browser restart, Safari/Firefox run, screen-reader audit or full accessibility certification. Text enlargement uses root font sizing, not browser zoom. External provider pages were not visited; their original URLs/images/metadata were preserved. Cache quota/storage failures and every possible long-running network condition are outside this focused regression coverage.
+
+## Optional offline source images
+
+App settings now has a “Save source images offline” action for the 58 curated directory logos. It downloads same-origin, content-addressed logos through the active service worker, reports saved/unavailable counts. Run it again after an app update if saved logos are unavailable. The default install shell is unchanged; remote source websites still require internet. README manual checks explain the Android Chrome flow.
+
+Validation: TypeScript type checks and build passed. `node tests/site.mjs` passed its 96 layouts and interactions, preserving all original source/image/font bytes. `node tests/service-worker.mjs` passed worker migration and offline navigation checks, including an explicit save plus preservation through upgrade. `node --test tests/worker-storage.mjs` passed 10 storage-failure tests; `node tests/pages.mjs` passed project-prefix/offline checks. Chromium simulation only; no physical Android device was available here.

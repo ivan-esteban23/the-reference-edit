@@ -533,6 +533,12 @@ const i18nEs = {
   "Architecture": "Arquitectura",
   "Graphic Design": "Diseño gráfico",
   "Other editions": "Otras ediciones",
-  "Read issue 02: The Portrait Edit": "Leer The Portrait Edit número 02"
+  "Read issue 02: The Portrait Edit": "Leer The Portrait Edit número 02",
+  "Save source images offline": "Guardar imágenes de fuentes sin conexión",
+  "Source logos load when visited. Save them here for offline reference.": "Las imágenes de fuentes se cargan al visitarlas. Guárdalas aquí para consultarlas sin conexión.",
+  "Saving source images… {saved} of {total}": "Guardando imágenes… {saved} de {total}",
+  "Offline images ready: {saved} saved, {failed} unavailable.": "Imágenes disponibles sin conexión: {saved} guardadas, {failed} no disponibles.",
+  "Open the installed app online once, then try again.": "Abre la app instalada con conexión una vez y vuelve a intentarlo.",
+  "Source images saved offline": "Imágenes de fuentes guardadas sin conexión"
 };
 type TKey = keyof typeof i18nEs;

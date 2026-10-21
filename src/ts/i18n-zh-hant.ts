@@ -532,5 +532,11 @@ const i18nZhHant: Record<TKey, string> = {
   "Architecture": "建築",
   "Graphic Design": "平面設計",
   "Other editions": "其他刊次",
-  "Read issue 02: The Portrait Edit": "閱讀 The Portrait Edit 第 02 期"
+  "Read issue 02: The Portrait Edit": "閱讀 The Portrait Edit 第 02 期",
+  "Save source images offline": "離線儲存來源圖片",
+  "Source logos load when visited. Save them here for offline reference.": "來源標誌會在造訪時載入。儲存到此裝置後即可離線查看。",
+  "Saving source images… {saved} of {total}": "正在儲存來源圖片…{total} 張中的 {saved} 張",
+  "Offline images ready: {saved} saved, {failed} unavailable.": "離線圖片已就緒：已儲存 {saved} 張，{failed} 張無法使用。",
+  "Open the installed app online once, then try again.": "請先在線開啟一次已安裝的應用程式，然後重試。",
+  "Source images saved offline": "來源圖片已儲存，可離線查看"
 };

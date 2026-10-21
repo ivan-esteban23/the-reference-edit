@@ -87,6 +87,14 @@ try {
   assert.ok(await ev("Promise.all([...document.images].map(i=>i.decode())).then(()=>true)"), 'External images did not decode');
   await until(`caches.open(${JSON.stringify(newCache)}).then(async c=>(await Promise.all(${JSON.stringify(imagePaths)}.map(p=>c.match(p)))).every(Boolean))`, 'On-demand images were not cached');
   check('Cover is precached; all source logos cache on demand after a controlled online visit');
+  const selectedImages=imagePaths.slice(0,3);
+  await ev(`caches.open(${JSON.stringify(newCache)}).then(c=>Promise.all(${JSON.stringify(selectedImages)}.map(p=>c.delete(p))))`);
+  const offlineSave=await ev(`new Promise(resolve=>{const channel=new MessageChannel();channel.port1.onmessage=e=>{if(e.data.type==='complete'||e.data.type==='error'){resolve(e.data);channel.port1.close();}};navigator.serviceWorker.controller.postMessage({type:'SAVE_SOURCE_IMAGES',paths:${JSON.stringify(selectedImages)}},[channel.port2]);})`);
+  assert.deepEqual(offlineSave,{type:'complete',saved:selectedImages.length,failed:0,total:selectedImages.length});
+  await offline(true);
+  assert.ok(await ev(`Promise.all(${JSON.stringify(selectedImages)}.map(p=>caches.open(${JSON.stringify(newCache)}).then(c=>c.match(p)))).then(rs=>rs.every(Boolean))`),'Explicitly saved images unavailable offline');
+  await offline(false);
+  check('Explicit save action downloads selected source images and retains them for offline use');
   // An HTTP failure must not poison a logo cache entry, and a later visit can retry it.
   await ev(`caches.open(${JSON.stringify(newCache)}).then(c=>c.delete(${JSON.stringify(logoPath)}))`);
   mode = 'image-error';

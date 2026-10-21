@@ -532,5 +532,11 @@ const i18nKo: Record<TKey, string> = {
   "Architecture": "건축",
   "Graphic Design": "그래픽 디자인",
   "Other editions": "다른 호",
-  "Read issue 02: The Portrait Edit": "The Portrait Edit 호 02 읽기"
+  "Read issue 02: The Portrait Edit": "The Portrait Edit 호 02 읽기",
+  "Save source images offline": "소스 이미지 오프라인 저장",
+  "Source logos load when visited. Save them here for offline reference.": "소스 로고는 방문할 때 불러옵니다. 여기에 저장하면 오프라인에서도 볼 수 있습니다.",
+  "Saving source images… {saved} of {total}": "소스 이미지 저장 중… {total}개 중 {saved}개",
+  "Offline images ready: {saved} saved, {failed} unavailable.": "오프라인 이미지 준비 완료: {saved}개 저장, {failed}개 사용 불가.",
+  "Open the installed app online once, then try again.": "설치된 앱을 온라인에서 한 번 연 뒤 다시 시도하세요.",
+  "Source images saved offline": "소스 이미지를 오프라인에 저장했습니다"
 };

@@ -77,9 +77,13 @@ Storage key `reference-edit-personal-sources-v1` contains `{version:1,sources:[.
 
 `personal-backup.mjs` runs eight backup check groups and 96 import-dialog layout/language/theme/text-size cases. It tests real JSON downloads, restore into an empty collection, preview/cancel, non-destructive merges, URL/ID collisions, invalid/oversized files, quota-failure retry, other-tab changes and offline import/export. The current mobile capture is `/tmp/reference-backup-results/mobile-import.png`; JSON results use the normal results directory. Temporary imported files and download directories are removed after the run.
 
-## Manual Safari checks (not automated)
+## Manual browser and device checks (not automated)
 
-Use current macOS Safari and an iPhone/iPad Safari installation over HTTPS. Record the OS/browser versions and repeat the core checks in an Add to Home Screen installation.
+You can test installation and offline behavior now on an Android phone using current Chrome over HTTPS. Add the site to the home screen, then try the core online/offline checks below. Safari and iPhone/iPad checks are future work until an Apple device is available; there is no automated Safari test to disable.
+
+To keep the curated source logos available offline, open **App settings** while online and choose **Save source images offline**. Wait for the saved count, then disconnect and revisit the directory. The images are stored on this device; available storage and browser eviction policies still apply. After an app update, save them again if they are no longer available. External source websites still require internet.
+
+When an Apple device becomes available, use current macOS Safari and an iPhone/iPad Safari installation over HTTPS. Record the OS/browser versions and repeat the core checks in an Add to Home Screen installation.
 
 1. Start with empty site storage, load online, then revisit online after the worker takes control so source logos can cache. Confirm the cover and logos render, and offline status reports ready.
 2. Save two favorites, select a language, theme and country filter. Disconnect the network; reload `/` and `/index.html`, then close and reopen the installed app. Confirm the directory, cover, cached logos and preferences survive.

@@ -1,5 +1,5 @@
 // Version the offline shell whenever index.html or its app assets change.
-const CACHE='visual-edit-shell-responsive-readability-v10';
+const CACHE='visual-edit-shell-responsive-readability-v11';
 // Precache the cover, gallery catalog and three illustrations. Source logos cache on demand.
 const SHELL=['/data/references.json','/images/references/tokyo-street/tokyo-street-01.jpg','/images/references/seoul-fashion-week/seoul-fashion-week-01.jpg','/images/references/paris-office/paris-office-01.jpg','/index.html','/manifest.webmanifest','/favicon.svg','/icons/reference-edit-192.png','/icons/reference-edit-512.png','/icons/reference-edit-maskable-512.png','/icons/reference-edit-apple-touch-180.png','/icons/reference-edit-favicon-64.png','/images/image-79c5c1401cc2d69b.jpg','/fonts/font-8a08d13f8a6c0d51.ttf','/fonts/font-29160a80ff49ddca.ttf'];
 // Hosting may redirect /index.html to /. Store a fresh response so navigation can reuse it safely.
@@ -42,6 +42,12 @@ self.addEventListener('fetch',event=>{
 });
 self.addEventListener('message',event=>{
  if(event.data?.type==='ACTIVATE_UPDATE'){event.waitUntil(self.skipWaiting());return;}
+ if(event.data?.type==='SAVE_SOURCE_IMAGES'&&event.ports[0]){event.waitUntil((async()=>{
+  const port=event.ports[0],paths=[...new Set(Array.isArray(event.data.paths)?event.data.paths:[])].filter(path=>typeof path==='string'&&/^\/images\/image-[a-f0-9]{16}\.(png|jpg|gif|ico|svg)$/.test(path)).slice(0,100);
+  let saved=0,failed=0;
+  try{const cache=await caches.open(CACHE);for(const path of paths){try{if(await cache.match(path)){saved++;continue;}const response=await fetch(path);if(!response.ok||response.type!=='basic')throw new Error('Image unavailable');await cache.put(path,response.clone());saved++;}catch(error){failed++;}port.postMessage({type:'progress',saved,failed,total:paths.length});}port.postMessage({type:'complete',saved,failed,total:paths.length});}
+  catch(error){port.postMessage({type:'error',saved,failed,total:paths.length});}
+ })());return;}
  if(event.data?.type==='OFFLINE_STATUS'&&event.ports[0]){event.waitUntil((async()=>{
   let ready=false;
   try{const cache=await caches.open(CACHE);const entries=await Promise.all(SHELL.map(path=>cache.match(path)));ready=entries.every(Boolean);}catch(error){/* Report unavailable storage instead of leaving the UI waiting. */}
