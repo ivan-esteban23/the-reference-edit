@@ -92,4 +92,14 @@ jobs:
       - name: Request a Pages build
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh api --method POST "repos/$GITHUB_REPOSITORY/pages/builds" --jq '.status'
+        run: |
+          for attempt in 1 2 3; do
+            if gh api --method POST "repos/$GITHUB_REPOSITORY/pages/builds" --jq '.status'; then
+              exit 0
+            fi
+            if [ "$attempt" -eq 3 ]; then
+              echo "::error::Pages build request failed after 3 attempts"
+              exit 1
+            fi
+            sleep "$((attempt * 2))"
+          done
