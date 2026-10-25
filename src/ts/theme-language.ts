@@ -16,3 +16,11 @@
  const sync=()=>{code.dataset.code=short[select.value]||select.value.toUpperCase();};
  select.addEventListener('change',sync);window.addEventListener('visual-edit:languagechange',sync);window.addEventListener('popstate',sync);sync();
 })();
+(()=>{
+ const root=document.documentElement, toggle=document.querySelector<HTMLButtonElement>('[data-text-size-toggle]');
+ if(!toggle)return;
+ const apply=(large:boolean)=>{if(large)root.dataset.textSize='large';else delete root.dataset.textSize;toggle.setAttribute('aria-pressed',String(large));};
+ apply(root.dataset.textSize==='large');
+ toggle.addEventListener('click',()=>{const next=root.dataset.textSize!=='large';apply(next);try{if(next)localStorage.setItem('visual-edit-text-size','large');else localStorage.removeItem('visual-edit-text-size');}catch(e){}});
+ window.addEventListener('storage',event=>{if(event.key!=='visual-edit-text-size'&&event.key!==null)return;apply(event.newValue==='large');});
+})();

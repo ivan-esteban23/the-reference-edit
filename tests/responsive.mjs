@@ -55,7 +55,7 @@ const measure = () => {
   // Width, not a device label, chooses layout; large tablets and laptops overlap.
   const expectedColumns=innerWidth<768 ? 1 : innerWidth<1280 ? 2 : 3;
   if(columns!==expectedColumns)errors.push(`directory columns ${columns}; expected ${expectedColumns}`);
-  const actionSelector='.cross-nav a,.hero-actions a,[data-theme-toggle],#language,#search,#filter-toggle,#mobile-directory,#mobile-saved,#mobile-sections,.source-actions button,.topic-buttons button,#region,#country-filter,#access-filter';
+  const actionSelector='.cross-nav a,.hero-actions a,[data-text-size-toggle],[data-theme-toggle],#language,#search,#filter-toggle,#mobile-directory,#mobile-saved,#mobile-sections,.source-actions button,.topic-buttons button,#region,#country-filter,#access-filter';
   for(const element of document.querySelectorAll(actionSelector)){
     if(!visible(element))continue;const r=rect(element);
     if(r.width<47.5 || r.height<47.5)errors.push('target below 48×48 CSS px: '+label(element)+' '+r.width.toFixed(1)+'×'+r.height.toFixed(1));

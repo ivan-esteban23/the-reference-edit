@@ -490,6 +490,7 @@ const i18nZhHans: Record<TKey, string> = {
   "Camel trench coat, Breton stripe, dark denim, and leather loafers.": "驼色风衣、海魂条纹上衣、深色牛仔裤与皮革乐福鞋。",
   "AI-generated editorial illustration · Created with ChatGPT · Not documentary photography": "AI 生成的编辑插画 · 使用 ChatGPT 创作 · 并非纪实摄影",
   "Dark": "深色",
+  "Large text": "大号字",
   "Fonts: Newsreader and Inter. Cover: The Portrait Edit / Study 02. Fonts and cover are saved with the offline directory; source logos are cached on later online visits. External websites need internet.": "字体：Newsreader 和 Inter。封面：The Portrait Edit / Study 02。字体和封面随离线目录保存；来源标志会在后续联网访问时缓存。外部网站需要互联网。",
   "Collection tools": "收藏工具",
   "My collection": "我的收藏集",
