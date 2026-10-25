@@ -16,16 +16,22 @@ npm run build
 
 The Pages setting remains **Deploy from a branch → `preview/phone` → `/ (root)`**. Despite its historical name, that branch is generated deployment output. Do not merge it into `main` or edit the generated files manually.
 
+## Continuous integration
+
+`.github/workflows/ci.yml` is the single test definition for the repository. It runs on pull requests and by manual dispatch, on the Node versions the project supports: the `>=22` floor from `package.json` and the current `24` release. Each job installs with `npm ci`, selects the runner's Google Chrome for the browser harness, runs the documented `npm test` command, and uploads `/tmp/reference-regression-results/` even when a suite fails. The workflow has read-only repository permissions, cannot publish, and cancels superseded pull-request runs.
+
+`npm test` includes `tests/workflows.mjs`, which checks this contract. It verifies that the CI matrix covers the declared Node floor, every `tests/*.mjs` suite is still reachable through `npm test`, the workflow keeps full history for the historical fixtures and read-only permissions, and the deployment workflow delegates testing instead of maintaining a second suite list.
+
 ## Automatic publication
 
-`.github/workflows/pages.yml` runs the regression suites for pull requests and pushes to `main`. Both jobs install the toolchain and build `dist/` first; the suites and the snapshot always run against freshly built output. After a successful test run on `main`, the publishing job:
+`.github/workflows/pages.yml` runs on pushes to `main` and by manual dispatch. Its `test` job calls the reusable CI workflow, so both supported Node versions must pass before publishing. PRs run CI directly and never trigger this workflow. After a successful test run on `main`, the publishing job:
 
 1. Prepares a fresh static snapshot outside the checkout with `scripts/prepare-pages.mjs`.
 2. Updates the generated `preview/phone` branch using a normal commit/push, preserving its history.
 3. Explicitly requests a GitHub Pages build. This is necessary because pushes made with the workflow's `GITHUB_TOKEN` do not trigger Pages builds automatically.
 
 
-Publication uses the workflow token with `contents: write` and `pages: write`, without a personal access token or repository secret. PR tests have read-only repository access and cannot publish. A failed test blocks the publishing job. Publishing requests are serialized for `main`.
+Publication uses the workflow token with `contents: write` and `pages: write`, without a personal access token or repository secret. CI tests have read-only repository access and cannot publish. A failed test on either Node version blocks the publishing job. Publishing requests are serialized for `main`.
 
 On first merge of the workflow, inspect **Actions → Test and publish website**, then the Pages build. The publishing job must succeed and the Pages build must complete before claiming that a merge is live. A successful local test alone does not validate GitHub's deployment permissions. If repository policy denies the workflow token's requested permissions, adjust the Actions policy in GitHub rather than adding credentials to source.
 
