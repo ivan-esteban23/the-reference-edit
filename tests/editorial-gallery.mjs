@@ -45,8 +45,8 @@ try{
  await call('Input.dispatchKeyEvent',{type:'keyDown',key:'Enter',code:'Enter',windowsVirtualKeyCode:13,text:'\r'});
  await call('Input.dispatchKeyEvent',{type:'keyUp',key:'Enter',code:'Enter',windowsVirtualKeyCode:13});
  await until("location.hash==='#editorial-gallery'");
- await ev("navigateDirectory(true);document.querySelector('#mobile-sections').click();document.querySelector('#sections-menu a[href=\"#editorial-gallery\"]').click()");
- assert.equal(await ev("!collectionOpen&&!document.querySelector('#sections-menu').open&&document.activeElement.id==='editorial-gallery'"),true);
+ await ev("navigateDirectory(true);document.querySelector('.section-navigation a[href=\"#editorial-gallery\"]').click()");
+ assert.equal(await ev("!collectionOpen&&document.activeElement.id==='editorial-gallery'"),true);
  const locales={en:'Tokyo',es:'Tokio','zh-Hans':'东京','zh-Hant':'東京',ja:'東京',ko:'도쿄'};
  for(const width of [320,390,768,1440])for(const size of [100,200])for(const theme of ['light','dark'])for(const locale of Object.keys(locales)){
   await call('Emulation.setDeviceMetricsOverride',{width,height:900,deviceScaleFactor:1,mobile:false});

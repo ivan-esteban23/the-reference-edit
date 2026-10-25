@@ -406,7 +406,6 @@ const i18nZhHans: Record<TKey, string> = {
   "Show all saved sources": "显示所有已收藏来源",
   "Mobile navigation": "移动导航",
   "Directory": "目录",
-  "Explore sections": "浏览章节",
   "{visible} of {saved} saved sources shown.": "显示 {saved} 个已收藏来源中的 {visible} 个。",
   "No saved sources match these filters. Show all saved sources to broaden your selection.": "没有已收藏来源符合这些筛选条件。显示所有已收藏来源以扩大选择范围。",
   "Browse countries ↗": "浏览国家 ↗",
