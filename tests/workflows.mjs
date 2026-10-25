@@ -10,10 +10,11 @@ const check=name=>{result.checks.push(name);console.log(name);};
 const read=file=>readFile(path.join(repo,file),'utf8');
 
 try{
- const [ci,pages,packageSource]=await Promise.all([
+ const [ci,pages,packageSource,dependabot]=await Promise.all([
   read('.github/workflows/ci.yml'),
   read('.github/workflows/pages.yml'),
   read('package.json'),
+  read('.github/dependabot.yml'),
  ]);
  const manifest=JSON.parse(packageSource),testScript=manifest.scripts?.test||'';
 
@@ -78,6 +79,15 @@ try{
   }
  }
  check('Workflow actions are versioned and files use space indentation');
+
+ assert.match(dependabot,/^version:\s*2$/m);
+ assert.match(dependabot,/package-ecosystem:\s*['"]?npm['"]?/);
+ assert.match(dependabot,/package-ecosystem:\s*['"]?github-actions['"]?/);
+ assert.match(dependabot,/interval:\s*['"]?weekly['"]?/);
+ assert.match(dependabot,/update-types:\s*\n\s*-\s*['"]?minor['"]?\n\s*-\s*['"]?patch['"]?/);
+ assert.doesNotMatch(dependabot,/\t/,"Dependabot configuration must not contain tab indentation");
+ check("Dependabot schedules weekly npm and actions updates with minor/patch grouping");
+
 
  result.passed=true;
 }catch(error){result.error=error.stack;process.exitCode=1;}

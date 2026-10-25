@@ -20,7 +20,7 @@ The Pages setting remains **Deploy from a branch → `preview/phone` → `/ (roo
 
 `.github/workflows/ci.yml` is the single test definition for the repository. It runs on pull requests and by manual dispatch, on the Node versions the project supports: the `>=22` floor from `package.json` and the current `24` release. Each job installs with `npm ci`, selects the runner's Google Chrome for the browser harness, runs the documented `npm test` command, and uploads `/tmp/reference-regression-results/` even when a suite fails. The workflow has read-only repository permissions, cannot publish, and cancels superseded pull-request runs.
 
-`npm test` includes `tests/workflows.mjs`, which checks this contract. It verifies that the CI matrix covers the declared Node floor, every `tests/*.mjs` suite is still reachable through `npm test`, the workflow keeps full history for the historical fixtures and read-only permissions, and the deployment workflow delegates testing instead of maintaining a second suite list.
+`npm test` includes `tests/workflows.mjs`, which checks this contract. It verifies that the CI matrix covers the declared Node floor, every `tests/*.mjs` suite is still reachable through `npm test`, the workflow keeps full history for the historical fixtures and read-only permissions, and the deployment workflow delegates testing instead of maintaining a second suite list. Dependency updates are scheduled through `.github/dependabot.yml` with weekly checks for `npm` and `github-actions`, grouping minor and patch updates to minimize review noise.
 
 ## Automatic publication
 

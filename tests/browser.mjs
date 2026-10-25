@@ -1,11 +1,20 @@
 // Dependency-free Chromium/CDP harness. Requires Node 22+ and Chromium.
 import {spawn, execFileSync} from 'node:child_process';
+import {existsSync} from 'node:fs';
 import {mkdtemp, readFile, readdir, rm, writeFile} from 'node:fs/promises';
 import {tmpdir} from 'node:os';
 import path from 'node:path';
 import http from 'node:http';
 import {fileURLToPath} from 'node:url';
 import assert from 'node:assert/strict';
+
+export function findChromium() {
+  if (process.env.CHROMIUM) return process.env.CHROMIUM;
+  for (const c of ['/usr/bin/chromium', '/usr/bin/chromium-browser', '/usr/bin/google-chrome-stable', '/usr/bin/google-chrome']) {
+    if (existsSync(c)) return c;
+  }
+  return '/usr/bin/chromium';
+}
 
 export const repo = fileURLToPath(new URL('../', import.meta.url));
 export const pause = ms => new Promise(resolve => setTimeout(resolve, ms));
@@ -33,7 +42,7 @@ export async function browser(handler) {
   await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
   const origin = `http://127.0.0.1:${server.address().port}`;
   const profile = await mkdtemp(path.join(tmpdir(), 'reference-regression-'));
-  const executable = process.env.CHROMIUM || '/usr/bin/chromium';
+  const executable = findChromium();
   const chrome = spawn(executable, [
     '--headless', '--no-sandbox', '--disable-dev-shm-usage', '--disable-gpu',
     '--no-first-run', '--no-default-browser-check', '--remote-debugging-port=0',
