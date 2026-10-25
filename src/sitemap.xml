@@ -1,6 +1,47 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
     <loc>https://ivan-esteban23.github.io/the-reference-edit/</loc>
+    <lastmod>2026-10-25</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://ivan-esteban23.github.io/the-reference-edit/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://ivan-esteban23.github.io/the-reference-edit/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://ivan-esteban23.github.io/the-reference-edit/?lang=es"/>
+    <xhtml:link rel="alternate" hreflang="ja" href="https://ivan-esteban23.github.io/the-reference-edit/?lang=ja"/>
+    <xhtml:link rel="alternate" hreflang="ko" href="https://ivan-esteban23.github.io/the-reference-edit/?lang=ko"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://ivan-esteban23.github.io/the-reference-edit/?lang=zh-hans"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://ivan-esteban23.github.io/the-reference-edit/?lang=zh-hant"/>
+  </url>
+  <url>
+    <loc>https://ivan-esteban23.github.io/the-reference-edit/?lang=es</loc>
+    <lastmod>2026-10-25</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://ivan-esteban23.github.io/the-reference-edit/?lang=ja</loc>
+    <lastmod>2026-10-25</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://ivan-esteban23.github.io/the-reference-edit/?lang=ko</loc>
+    <lastmod>2026-10-25</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://ivan-esteban23.github.io/the-reference-edit/?lang=zh-hans</loc>
+    <lastmod>2026-10-25</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://ivan-esteban23.github.io/the-reference-edit/?lang=zh-hant</loc>
+    <lastmod>2026-10-25</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
   </url>
 </urlset>

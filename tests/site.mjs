@@ -111,6 +111,74 @@ const result = {sourceRecords: 58, recordsByteIdenticalExceptImageURLs: true, im
 const page = await browser((req, res) => serve(files, req, res));
 const {evaluate: ev, call, navigate} = page;
 const check = name => {result.checks.push(name); console.log(name);};
+
+  // SEO, social sharing metadata and JSON-LD verification
+  const canonicalMatches = [...html.matchAll(/<link\s+rel="canonical"\s+href="([^"]+)">/g)];
+  assert.equal(canonicalMatches.length, 1, 'Exactly one canonical link required');
+  assert.equal(canonicalMatches[0][1], 'https://ivan-esteban23.github.io/the-reference-edit/');
+
+  const descMatches = [...html.matchAll(/<meta\s+name="description"\s+content="([^"]+)">/g)];
+  assert.equal(descMatches.length, 1, 'Exactly one meta description required');
+  assert.ok(descMatches[0][1].length > 20);
+
+  const ogTags = {};
+  for (const match of html.matchAll(/<meta\s+property="(og:[^"]+)"\s+content="([^"]+)">/g)) {
+    assert.ok(!ogTags[match[1]], `Duplicate Open Graph tag: ${match[1]}`);
+    ogTags[match[1]] = match[2];
+  }
+  for (const required of ['og:type', 'og:site_name', 'og:title', 'og:description', 'og:url', 'og:image', 'og:image:width', 'og:image:height', 'og:image:alt']) {
+    assert.ok(ogTags[required], `Missing Open Graph tag: ${required}`);
+  }
+  assert.equal(ogTags['og:type'], 'website');
+  assert.equal(ogTags['og:image:width'], '1200');
+  assert.equal(ogTags['og:image:height'], '630');
+  assert.equal(ogTags['og:image'], 'https://ivan-esteban23.github.io/the-reference-edit/screenshots/share-1200x630.png');
+
+  const twitterTags = {};
+  for (const match of html.matchAll(/<meta\s+name="(twitter:[^"]+)"\s+content="([^"]+)">/g)) {
+    assert.ok(!twitterTags[match[1]], `Duplicate Twitter card tag: ${match[1]}`);
+    twitterTags[match[1]] = match[2];
+  }
+  for (const required of ['twitter:card', 'twitter:title', 'twitter:description', 'twitter:image', 'twitter:image:alt']) {
+    assert.ok(twitterTags[required], `Missing Twitter card tag: ${required}`);
+  }
+  assert.equal(twitterTags['twitter:card'], 'summary_large_image');
+  assert.equal(twitterTags['twitter:image'], 'https://ivan-esteban23.github.io/the-reference-edit/screenshots/share-1200x630.png');
+
+  const hreflangs = {};
+  for (const match of html.matchAll(/<link\s+rel="alternate"\s+hreflang="([^"]+)"\s+href="([^"]+)">/g)) {
+    assert.ok(!hreflangs[match[1]], `Duplicate hreflang tag: ${match[1]}`);
+    hreflangs[match[1]] = match[2];
+  }
+  for (const lang of ['x-default', 'en', 'es', 'ja', 'ko', 'zh-Hans', 'zh-Hant']) {
+    assert.ok(hreflangs[lang], `Missing hreflang alternate for: ${lang}`);
+  }
+
+  const jsonLdMatch = html.match(/<script\s+type="application\/ld\+json">([\s\S]*?)<\/script>/);
+  assert.ok(jsonLdMatch, 'Missing application/ld+json script');
+  const jsonLd = JSON.parse(jsonLdMatch[1]);
+  assert.equal(jsonLd['@context'], 'https://schema.org');
+  assert.ok(Array.isArray(jsonLd['@graph']), 'JSON-LD must use @graph');
+  const website = jsonLd['@graph'].find(item => item['@type'] === 'WebSite');
+  assert.ok(website, 'Missing WebSite schema in JSON-LD');
+  assert.equal(website.url, 'https://ivan-esteban23.github.io/the-reference-edit/');
+  const collection = jsonLd['@graph'].find(item => item['@type'] === 'CollectionPage');
+  assert.ok(collection, 'Missing CollectionPage schema in JSON-LD');
+  assert.equal(collection.mainEntity?.['@type'], 'ItemList');
+  assert.equal(collection.mainEntity?.numberOfItems, 58);
+  assert.equal(collection.mainEntity?.itemListElement?.length, 58);
+  assert.ok(collection.mainEntity.itemListElement.every(item => item['@type'] === 'ListItem' && item.item?.name && item.item?.url));
+
+  const sitemap = files.get('/sitemap.xml')?.toString() || '';
+  assert.ok(sitemap.includes('<loc>https://ivan-esteban23.github.io/the-reference-edit/</loc>'));
+  assert.ok(sitemap.includes('<lastmod>2026-10-25</lastmod>'));
+  for (const lang of ['es', 'ja', 'ko', 'zh-hans', 'zh-hant']) {
+    assert.ok(sitemap.includes(`<loc>https://ivan-esteban23.github.io/the-reference-edit/?lang=${lang}</loc>`), `Sitemap missing URL for ${lang}`);
+  }
+  const robots = files.get('/robots.txt')?.toString() || '';
+  assert.match(robots, /Sitemap:\s*https:\/\/ivan-esteban23\.github\.io\/the-reference-edit\/sitemap\.xml/);
+  check('SEO, Open Graph, Twitter cards, hreflang alternates, sitemap and JSON-LD pass validation');
+
 const select = (id, value) => ev(`(()=>{const e=document.querySelector(${JSON.stringify(id)});e.value=${JSON.stringify(value)};e.dispatchEvent(new Event('change'));})()`);
 const search = value => ev(`(()=>{const e=document.querySelector('#search');e.value=${JSON.stringify(value)};e.dispatchEvent(new Event('input'));})()`);
 const key = async (key, code = key) => {
