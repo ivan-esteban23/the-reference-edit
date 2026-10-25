@@ -29,36 +29,28 @@ try{
   assert.deepEqual(await ev("['mobile-saved','mobile-directory','open-collection'].map(id=>document.getElementById(id).getAttribute('aria-pressed'))"),[String(open),String(!open),String(open)]);
  };
  // pushState does not fire hashchange: every view switch must sync selection itself.
- const sections=await ev("[...document.querySelectorAll('#sections-menu a')].map(a=>a.getAttribute('href'))");
+ const sections=await ev("[...document.querySelectorAll('.section-navigation .jump a')].map(a=>a.getAttribute('href'))");
  for(const href of sections){
   await click('#mobile-saved');await assertNavigation(true);
-  await click('#mobile-sections');await assertNavigation(true);
-  await click(`#sections-menu a[href="${href}"]`);
+  await click(`.section-navigation .jump a[href="${href}"]`);
   await assertNavigation(false);
   assert.equal(await ev('location.hash'),href);
   assert.equal(await ev('document.activeElement.id'),href.slice(1));
-  assert.equal(await ev("document.querySelector('#sections-menu').open"),false);
  }
- await click('#mobile-saved');await click('#mobile-sections');
- await click('#sections-menu button');await assertNavigation(true);
- await click('#mobile-sections');
- await call('Input.dispatchKeyEvent',{type:'keyDown',key:'Escape',code:'Escape',windowsVirtualKeyCode:27});
- await call('Input.dispatchKeyEvent',{type:'keyUp',key:'Escape',code:'Escape',windowsVirtualKeyCode:27});
- await until("!document.querySelector('#sections-menu').open");await assertNavigation(true);
- await click('#mobile-sections');await click('#sections-menu a[href="#routes"]');
+ await click('#mobile-saved');await click('.section-navigation a[href="#routes"]');
  await ev('history.back()');await until("location.hash==='#my-sources'");await assertNavigation(true);
  await ev('history.forward()');await until("location.hash==='#routes'");await assertNavigation(false);
  for(const hash of ['#my-sources','#routes','#workflow','#landscape','#notes','#directory']){
   await navigate('/?navigation-test='+hash.slice(1)+hash);await assertNavigation(hash==='#my-sources');
  }
  await ev("countryFilter.value='Japan';search.value='fashion';update()");
- await click('#mobile-saved');await click('#mobile-sections');await click('#sections-menu a[href="#routes"]');
+ await click('#mobile-saved');await click('.section-navigation a[href="#routes"]');
  await assertNavigation(false);assert.equal(await ev('location.hash'),'#routes');
  assert.equal(await ev("countryFilter.value==='Japan'&&search.value==='fashion'"),true);
  await click('#mobile-saved');await click('#mobile-directory');await assertNavigation(false);
  await click('#open-collection');await assertNavigation(true);
  await click('#collection-back');await assertNavigation(false);
- check('Phone navigation selection follows every Sections destination, cancellation, history, deep links and view entry/return; filtered guide links keep their target');
+ check('Phone navigation selection follows every Sections destination, history, deep links and view entry/return; filtered guide links keep their target');
  await call('Emulation.setDeviceMetricsOverride',{width:1440,height:900,deviceScaleFactor:1,mobile:false});
  await click('#open-collection');assert.equal(await collectionVisible(),true);
  check('Mobile and desktop entry, empty-state guidance, return navigation and heading focus');

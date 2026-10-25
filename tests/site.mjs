@@ -161,7 +161,7 @@ try {
   await pause(50);
   result.mobileEntry=await ev("({searchTop:document.querySelector('.search-bar').getBoundingClientRect().top,firstCardTop:document.querySelector('.source').getBoundingClientRect().top,toolsClosed:!document.querySelector('#collection-tools').open,collectionHidden:document.querySelector('#my-sources').hidden})");
   assert.ok(result.mobileEntry.searchTop<1000&&result.mobileEntry.firstCardTop<1550,'Mobile entry became too long: '+JSON.stringify(result.mobileEntry));
-  assert.ok(result.mobileEntry.toolsClosed&&result.mobileEntry.collectionHidden&&await ev("getComputedStyle(document.querySelector('.section-navigation')).display==='none'&&document.querySelector('#sections-menu nav a[aria-current=location]')?.getAttribute('href')==='#directory'"));
+  assert.ok(result.mobileEntry.toolsClosed&&result.mobileEntry.collectionHidden&&await ev("getComputedStyle(document.querySelector('.section-navigation')).display!=='none'&&document.querySelector('.section-navigation .jump a[aria-current=\"true\"]')?.getAttribute('href')==='#directory'"));
   await ev("document.querySelector('#collection-tools').open=true");
   assert.ok(await ev("['#export-favorites','#share-view'].every(s=>document.querySelector(s).getClientRects().length>0)"),'Collection tools inaccessible when expanded');
   await ev("document.querySelector('#collection-tools').open=false");
@@ -342,6 +342,30 @@ try {
   result.accessibleControls = controls.length;
   assert.ok(await ev("[...document.querySelectorAll('.source h3 a')].every(a=>/^https?:$/.test(new URL(a.href).protocol))&&[...document.querySelectorAll('a[href^=\"#\"]')].every(a=>{const h=a.getAttribute('href').split('?')[0];return h==='#'||!!document.querySelector(h)})"));
   check('Accessible control names and all local link targets/source-link URL schemes');
+  const navCheck = await ev(`(()=>{
+    const header = document.querySelector('header.site-header.section-navigation');
+    const links = [...header.querySelectorAll('.jump a')].map(a => ({href: a.getAttribute('href'), text: a.textContent.trim(), target: !!document.querySelector(a.getAttribute('href'))}));
+    const dialog = document.querySelector('#sections-menu');
+    const mobileBtn = document.querySelector('#mobile-sections');
+    const footerNavLinks = [...document.querySelectorAll('.footer-nav a')].map(a => a.getAttribute('href'));
+    const skipLink = document.querySelector('.skip-link');
+    const firstFocusable = document.querySelector('a[href],button,input,select,textarea,[tabindex]:not([tabindex="-1"])');
+    return {
+      headerFound: !!header,
+      links,
+      dialogRemoved: !dialog,
+      mobileBtnRemoved: !mobileBtn,
+      footerNavLinks,
+      skipLinkFirst: firstFocusable === skipLink && skipLink?.getAttribute('href') === '#directory'
+    };
+  })()`);
+  assert.ok(navCheck.headerFound, 'Header navigation missing');
+  assert.deepEqual(navCheck.links.map(l => l.href), ['#routes', '#directory', '#editorial-gallery', '#editors', '#shortlist', '#asia-browse', '#notes'], 'Header links order mismatch');
+  assert.ok(navCheck.links.every(l => l.target), 'Header link target missing from page');
+  assert.ok(navCheck.dialogRemoved && navCheck.mobileBtnRemoved, 'Explore sections dialog or mobile button not removed');
+  assert.deepEqual(navCheck.footerNavLinks, ['#top', '#notes'], 'Footer nav contains duplicate section links');
+  assert.ok(navCheck.skipLinkFirst, 'Skip link must be the first focusable element on the page');
+  check('Single primary header navigation with 7 verified targets, no duplicate dialog, and skip link');
   await call('Emulation.setDeviceMetricsOverride',{width:1440,height:900,deviceScaleFactor:1,mobile:false});
   await ev('document.documentElement.style.fontSize="";delete document.documentElement.dataset.textSize;');
   const readingCheck = await ev(`(()=>{

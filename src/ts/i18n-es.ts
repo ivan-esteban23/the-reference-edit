@@ -407,7 +407,6 @@ const i18nEs = {
   "Show all saved sources": "Mostrar todas las fuentes guardadas",
   "Mobile navigation": "Navegación móvil",
   "Directory": "Directorio",
-  "Explore sections": "Explorar secciones",
   "{visible} of {saved} saved sources shown.": "Se muestran {visible} de {saved} fuentes guardadas.",
   "No saved sources match these filters. Show all saved sources to broaden your selection.": "Ninguna fuente guardada coincide con estos filtros. Muestra todas las fuentes guardadas para ampliar la selección.",
   "Browse countries ↗": "Explorar países ↗",

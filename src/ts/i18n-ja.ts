@@ -406,7 +406,6 @@ const i18nJa: Record<TKey, string> = {
   "Show all saved sources": "保存済みソースをすべて表示",
   "Mobile navigation": "モバイルナビゲーション",
   "Directory": "一覧",
-  "Explore sections": "セクションを探す",
   "{visible} of {saved} saved sources shown.": "保存済み {saved} 件中 {visible} 件を表示。",
   "No saved sources match these filters. Show all saved sources to broaden your selection.": "条件に一致する保存済みソースはありません。保存済みソースをすべて表示して選択範囲を広げてください。",
   "Browse countries ↗": "国別に探す ↗",

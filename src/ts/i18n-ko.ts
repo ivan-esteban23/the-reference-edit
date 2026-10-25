@@ -406,7 +406,6 @@ const i18nKo: Record<TKey, string> = {
   "Show all saved sources": "저장한 자료 모두 보기",
   "Mobile navigation": "모바일 탐색",
   "Directory": "목록",
-  "Explore sections": "섹션 둘러보기",
   "{visible} of {saved} saved sources shown.": "저장한 자료 {saved}개 중 {visible}개 표시.",
   "No saved sources match these filters. Show all saved sources to broaden your selection.": "이 필터에 맞는 저장 자료가 없습니다. 저장한 자료를 모두 표시하여 선택 범위를 넓히세요.",
   "Browse countries ↗": "국가 둘러보기 ↗",

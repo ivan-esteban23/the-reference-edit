@@ -56,7 +56,7 @@ const measure = () => {
   // Width, not a device label, chooses layout; large tablets and laptops overlap.
   const expectedColumns=innerWidth<768 ? 1 : innerWidth<1280 ? 2 : 3;
   if(columns!==expectedColumns)errors.push(`directory columns ${columns}; expected ${expectedColumns}`);
-  const actionSelector='.cross-nav a,.hero-actions a,[data-text-size-toggle],[data-theme-toggle],#language,#search,#filter-toggle,#mobile-directory,#mobile-saved,#mobile-sections,.source-actions button,.topic-buttons button,#region,#country-filter,#access-filter';
+  const actionSelector='.cross-nav a,.hero-actions a,[data-text-size-toggle],[data-theme-toggle],#language,#search,#filter-toggle,#mobile-directory,#mobile-saved,.source-actions button,.topic-buttons button,#region,#country-filter,#access-filter';
   for(const element of document.querySelectorAll(actionSelector)){
     if(!visible(element))continue;const r=rect(element);
     if(r.width<47.5 || r.height<47.5)errors.push('target below 48×48 CSS px: '+label(element)+' '+r.width.toFixed(1)+'×'+r.height.toFixed(1));
@@ -121,25 +121,21 @@ try {
   }
   result.checks.push('Paired DPR 1/2 keeps CSS viewport, typography and column count unchanged (not browser zoom)');
   await resize({width:393,height:900});
-  await ev("document.querySelector('#mobile-sections').focus();document.querySelector('#mobile-sections').click()");
-  assert.ok(await ev("document.querySelector('#sections-menu').open&&document.activeElement.closest('#sections-menu')!==null"),'Mobile menu must receive focus');
-  const ax=await call('Accessibility.getFullAXTree');
-  assert.ok(ax.nodes.some(node=>!node.ignored && node.role?.value==='dialog' && node.name?.value?.trim()),'Mobile menu needs an accessible dialog name');
-  const menuFocus=[];
-  for(let index=0;index<10;index++){
-    // Native modal traversal may briefly put focus on the document/browser
-    // chrome at wraparound; it must never reach an inert background control.
-    await key('Tab');assert.ok(await ev("document.activeElement===document.body||document.activeElement.closest('#sections-menu')!==null"),'Tab reached a background control while modal menu is open');
-    menuFocus.push(await ev("document.activeElement.textContent.trim()"));
+  assert.equal(await ev("document.querySelector('#sections-menu')"), null, 'Mobile menu dialog must be removed');
+  assert.equal(await ev("document.querySelector('#mobile-sections')"), null, 'Mobile sections button must be removed');
+  const headerLinks = await ev("[...document.querySelectorAll('.section-navigation .jump a')].map(a => ({href: a.getAttribute('href'), text: a.textContent.trim(), target: !!document.querySelector(a.getAttribute('href'))}))");
+  assert.equal(headerLinks.length, 7, 'Sticky header navigation must have 7 links');
+  assert.ok(headerLinks.every(link => link.target), 'Every header link must target an existing section');
+  const navTargets = await ev("(()=>{const d=document.querySelector('.section-navigation .jump');return [...d.querySelectorAll('a')].map(e=>({width:e.getBoundingClientRect().width,height:e.getBoundingClientRect().height}));})()");
+  assert.ok(navTargets.every(target => target.height >= 43.5), 'Header navigation links below 44px minimum touch target height');
+  await ev("document.querySelector('.section-navigation .jump a').focus()");
+  const navFocus = [];
+  for (let index = 0; index < 7; index++) {
+    navFocus.push(await ev("document.activeElement.getAttribute('href')"));
+    await key('Tab');
   }
-  assert.ok(new Set(menuFocus).size>2,'Tab must actually traverse menu links');
-  const menuBounds=await ev("(()=>{const d=document.querySelector('#sections-menu'),r=d.getBoundingClientRect();return {left:r.left,right:r.right,top:r.top,bottom:r.bottom,targets:[...d.querySelectorAll('button,a')].map(e=>({width:e.getBoundingClientRect().width,height:e.getBoundingClientRect().height}))};})()");
-  assert.ok(menuBounds.left>=0 && menuBounds.right<=393 && menuBounds.top>=0 && menuBounds.bottom<=900,'Menu outside viewport');
-  assert.ok(menuBounds.targets.every(target=>target.width>=48 && target.height>=48),'Menu actions below 48×48 CSS px');
-  await key('Escape');
-  await page.until("!document.querySelector('#sections-menu').open",'Escape must close mobile menu');
-  assert.ok(await ev("document.activeElement.id==='mobile-sections'"),'Escape must restore trigger focus');
-  result.checks.push('Mobile menu accessible name, in-dialog Tab focus, 48px targets, Escape dismissal and trigger focus restoration');
+  assert.deepEqual(navFocus, ['#routes', '#directory', '#editorial-gallery', '#editors', '#shortlist', '#asia-browse', '#notes'], 'Tab must traverse header links in logical order');
+  result.checks.push('Sticky header navigation links: 7 targets, touch target heights, logical Tab order, no duplicate dialogs');
   await ev("(()=>{document.querySelector('#reset').click();document.querySelector('[data-topic=photography]').click();const region=document.querySelector('#region');region.value='Japan';region.dispatchEvent(new Event('change',{bubbles:true}));const country=document.querySelector('#country-filter');country.value='Japan';country.dispatchEvent(new Event('change',{bubbles:true}));})()");
   assert.ok(await ev("['topic','country','region'].every(key=>document.querySelector('[data-remove-filter='+key+']'))"),'Independent chip fixture missing');
   await ev("document.querySelector('[data-remove-filter=country]').click()");
