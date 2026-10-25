@@ -426,7 +426,7 @@ html[data-text-size="large"]{font-size:112.5%}html[data-text-size="xlarge"]{font
 .palette-meta{display:block;margin-top:2px;font-family:var(--mono);font-size:var(--text-small);letter-spacing:.04em;text-transform:uppercase;color:var(--muted)}
 .palette-hint{display:flex;gap:8px;align-items:center;justify-content:flex-end;margin:0;padding:8px 18px;border-top:1px solid var(--line);font-family:var(--mono);font-size:var(--text-small);color:var(--muted)}
 .palette-key{border:1px solid var(--line);border-radius:6px;padding:3px 7px;background:var(--soft)}
-@media(max-width:639px){.controls{display:grid;grid-template-columns:minmax(0,1fr) auto auto}.controls #filter-toggle,.controls #palette-open{display:inline-flex;align-items:center;width:auto}.controls #palette-open{padding:8px 10px}.palette-open .palette-label{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}}
+@media(max-width:639px){.controls{display:grid;grid-template-columns:minmax(0,1fr) auto auto}.controls #filter-toggle,.controls #palette-open{display:inline-flex;align-items:center;width:auto}.controls #palette-open{padding:8px 10px}.palette-open .palette-label{display:none}}
 @container(max-width:16rem){.masthead{flex-wrap:wrap}.masthead-actions{max-width:100%;flex-wrap:wrap}}
 @container(max-width:12rem){.controls{grid-template-columns:minmax(0,1fr)}.controls #filter-toggle{width:100%}.controls #palette-open{width:100%}}
 
@@ -624,7 +624,7 @@ html[data-text-size="large"]{font-size:112.5%}html[data-text-size="xlarge"]{font
  .controls button{background:transparent;white-space:nowrap}
  .filter-panel>summary{display:none}
  .filter-panel[open]{margin-bottom:var(--space-2)}
- @container(max-width:28rem){.palette-open .palette-label{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}.controls #palette-open{padding:8px 10px}}
+ @container(max-width:28rem){.palette-open .palette-label{display:none}.controls #palette-open{padding:8px 10px}}
  .directory-tools{padding-block:20px}
  .topic-shortcuts>p{font-size:var(--text-label);color:var(--muted)}
  .topic-buttons{gap:4px 20px;border-bottom:1px solid var(--line);padding-bottom:12px}
@@ -765,3 +765,5 @@ html[data-text-size="large"]{font-size:112.5%}html[data-text-size="xlarge"]{font
    compact three-column rule, not be overwritten by it. */
 @container(max-width:20rem){.controls{grid-template-columns:minmax(0,1fr)}.controls #filter-toggle,.controls #palette-open{width:100%}}
 @media print{.cross-nav{display:none!important}}
+
+mark.search-highlight{background:var(--soft);color:var(--ink);padding:0 2px;border-radius:2px}
