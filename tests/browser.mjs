@@ -110,13 +110,23 @@ export async function browser(handler) {
     return {origin, call, evaluate, until, navigate, close, exceptions, navigations};
   } catch (error) {await close(); throw error;}
 }
+import {gzipSync} from 'node:zlib';
+const gzipCache = new WeakMap();
 export function serve(files, req, res) {
   const pathname = new URL(req.url, 'http://localhost').pathname;
   const key = pathname === '/' ? '/index.html' : pathname, body = files.get(key);
   if (!body) {res.writeHead(404); res.end(); return;}
   res.setHeader('Cache-Control', 'no-store');
-  const types = {'.html':'text/html; charset=utf-8','.js':'text/javascript','.svg':'image/svg+xml','.webmanifest':'application/manifest+json','.png':'image/png','.jpg':'image/jpeg','.gif':'image/gif','.ico':'image/x-icon','.ttf':'font/ttf'};
-  res.setHeader('Content-Type', types[path.extname(key)] || 'application/octet-stream');
+  const ext = path.extname(key);
+  const types = {'.html':'text/html; charset=utf-8','.js':'text/javascript','.json':'application/json; charset=utf-8','.svg':'image/svg+xml','.webmanifest':'application/manifest+json','.png':'image/png','.jpg':'image/jpeg','.gif':'image/gif','.ico':'image/x-icon','.ttf':'font/ttf'};
+  res.setHeader('Content-Type', types[ext] || 'application/octet-stream');
+  if (req.headers['accept-encoding']?.includes('gzip') && ['.html','.js','.json','.svg','.webmanifest','.ico','.ttf'].includes(ext)) {
+    let gz = gzipCache.get(body);
+    if (!gz) { gz = gzipSync(body); gzipCache.set(body, gz); }
+    res.setHeader('Content-Encoding', 'gzip');
+    res.end(gz);
+    return;
+  }
   res.end(body);
 }
 export async function report(name, result) {

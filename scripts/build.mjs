@@ -78,7 +78,8 @@ async function inline(markup, pattern, render) {
 }
 
 const styles = await inline(html, INLINED_STYLE, async file => {
-  const css = await load(file);
+  const rawCss = await load(file);
+  const css = rawCss.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\s*([;{},])\s*/g, '$1').replace(/:\s+/g, ':').replace(/;}/g, '}').trim();
   if (css.includes('</style')) throw new Error(`${file} contains a style end tag`);
   return `<style>${css}</style>`;
 });

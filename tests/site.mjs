@@ -274,7 +274,7 @@ try {
   assert.ok(await ev("document.documentElement.lang==='es'&&document.documentElement.dataset.theme==='dark'&&favoriteKeys.size===1&&document.querySelector('#country-filter').value==='Japan'"));
   await navigate('/');
   assert.ok(await ev("document.documentElement.lang==='es'&&document.documentElement.dataset.theme==='dark'&&document.documentElement.dataset.textSize==='large'&&favoriteKeys.size===1"));
-  await ev("document.querySelector('[data-text-size-toggle]').click()");
+  await ev("document.querySelector('[data-text-size-toggle]').click()"); assert.equal(await ev("document.documentElement.dataset.textSize"), 'xlarge'); await ev("document.querySelector('[data-text-size-toggle]').click()"); assert.equal(await ev("document.documentElement.dataset.textSize"), undefined);
   check('Favorites/theme/language persistence on reload and reopen; shared filter restoration');
   await select('#language', 'en');
   await navigate('/?guide-check=1#workflow');
@@ -320,6 +320,31 @@ try {
   result.accessibleControls = controls.length;
   assert.ok(await ev("[...document.querySelectorAll('.source h3 a')].every(a=>/^https?:$/.test(new URL(a.href).protocol))&&[...document.querySelectorAll('a[href^=\"#\"]')].every(a=>{const h=a.getAttribute('href').split('?')[0];return h==='#'||!!document.querySelector(h)})"));
   check('Accessible control names and all local link targets/source-link URL schemes');
+  await call('Emulation.setDeviceMetricsOverride',{width:1440,height:900,deviceScaleFactor:1,mobile:false});
+  await ev('document.documentElement.style.fontSize="";delete document.documentElement.dataset.textSize;');
+  const readingCheck = await ev(`(()=>{
+    const selectors = ['#notes p', '.route-body p', '#workflow p', '.source-purpose', '.editor-pick p', '#shortlist p'];
+    const elements = selectors.map(s => document.querySelector(s));
+    const checkMetrics = () => elements.map(el => {
+      const cs = getComputedStyle(el);
+      const fs = parseFloat(cs.fontSize);
+      const lh = parseFloat(cs.lineHeight) / fs;
+      return {fs, lh: Math.round(lh * 100) / 100};
+    });
+    const base = checkMetrics();
+    const toggle = document.querySelector('[data-text-size-toggle]');
+    toggle.click(); const large = checkMetrics();
+    toggle.click(); const xlarge = checkMetrics();
+    toggle.click(); const reset = checkMetrics();
+    const fontSwap = [...document.styleSheets].flatMap(s => [...s.cssRules]).filter(r => r.constructor.name === 'CSSFontFaceRule').map(r => ({family: r.style.fontFamily.replace(/["']/g, ''), display: r.style.fontDisplay, weight: r.style.fontWeight}));
+    return {base, large: large.map(x => x.fs), xlarge: xlarge.map(x => x.fs), reset: reset.map(x => x.fs), fontSwap};
+  })()`);
+  assert.ok(readingCheck.base.every(x => x.fs >= 16 && x.lh >= 1.5 && x.lh <= 1.7), JSON.stringify(readingCheck.base));
+  assert.ok(readingCheck.large.every(fs => fs === 18), JSON.stringify(readingCheck.large));
+  assert.ok(readingCheck.xlarge.every(fs => fs === 20), JSON.stringify(readingCheck.xlarge));
+  assert.ok(readingCheck.reset.every(fs => fs === 16), JSON.stringify(readingCheck.reset));
+  assert.deepEqual(readingCheck.fontSwap, [{family: 'Newsreader', display: 'swap', weight: '350 600'}, {family: 'Inter', display: 'swap', weight: '400 600'}]);
+  check('Reading column uses 16px minimum, 1.65 line-height, 65ch measure, 16/18/20px text-size control, and font-display:swap');
   assert.deepEqual(page.exceptions, []); result.passed = true;
 } catch (error) {result.passed = false; result.error = error.stack; process.exitCode = 1;}
 finally {await page.close(); await report('site', result);}
