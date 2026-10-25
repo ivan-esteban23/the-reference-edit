@@ -3,7 +3,6 @@ name: Test and publish website
 on:
   push:
     branches: [main]
-  pull_request:
   workflow_dispatch:
 
 permissions:
@@ -15,48 +14,10 @@ concurrency:
 
 jobs:
   test:
-    runs-on: ubuntu-24.04
-    timeout-minutes: 15
-    steps:
-      - uses: actions/checkout@v5
-        with:
-          fetch-depth: 0
-      - uses: actions/setup-node@v5
-        with:
-          node-version: '24'
-          cache: npm
-      - run: npm ci
-      - name: Type check
-        run: npm run typecheck
-      - name: Build the site
-        run: npm run build
-      - name: Locate Chromium
-        run: |
-          chrome_binary=$(command -v google-chrome)
-          echo "CHROMIUM=$chrome_binary" >> "$GITHUB_ENV"
-      - run: node tests/site.mjs
-      - run: node tests/responsive.mjs
-      - run: node tests/editorial-gallery.mjs
-      - run: node tests/chooser.mjs
-      - run: node tests/collection.mjs
-      - run: node tests/recently-viewed.mjs
-      - run: node tests/personal-sources.mjs
-      - run: node tests/personal-backup.mjs
-      - run: node tests/collection-backup.mjs
-      - run: node tests/collection-folders.mjs
-      - run: node tests/source-notes.mjs
-      - run: node tests/storage-compat.mjs
-      - run: node tests/service-worker.mjs
-      - run: node --test tests/worker-storage.mjs
-      - run: node tests/pages.mjs
-      - uses: actions/upload-artifact@v6
-        if: always()
-        with:
-          name: website-test-results
-          path: /tmp/reference-regression-results/
+    uses: ./.github/workflows/ci.yml
 
   publish:
-    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    if: github.ref == 'refs/heads/main'
     needs: test
     runs-on: ubuntu-24.04
     timeout-minutes: 10

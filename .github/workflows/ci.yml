@@ -1,0 +1,47 @@
+name: CI
+
+on:
+  pull_request:
+  workflow_dispatch:
+  workflow_call:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  test:
+    name: Test (Node ${{ matrix.node }})
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        node: ['22', '24']
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v5
+        with:
+          node-version: ${{ matrix.node }}
+          cache: npm
+      - name: Install dependencies
+        run: npm ci
+      - name: Locate Chromium
+        run: |
+          chrome_binary=$(command -v google-chrome)
+          test -n "$chrome_binary"
+          echo "CHROMIUM=$chrome_binary" >> "$GITHUB_ENV"
+      - name: Run the regression suite
+        run: npm test
+      - name: Upload regression results
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: regression-results-node-${{ matrix.node }}
+          path: /tmp/reference-regression-results/
+          if-no-files-found: ignore
