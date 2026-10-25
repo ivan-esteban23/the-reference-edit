@@ -3,7 +3,7 @@ import {assets, browser, serve, report} from './browser.mjs';
 
 // These are CSS viewport dimensions, not marketing/device panel resolutions.
 const viewports = [
-  ...[360, 375, 393, 412, 430, 440].map(width => ({width, height: 900, group: 'mobile'})),
+  ...[320, 360, 375, 393, 412, 414, 430, 440].map(width => ({width, height: 900, group: 'mobile'})),
   ...[768, 800, 834, 924, 1024, 1180, 1280, 1366, 1480].map(width => ({width, height: 1080, group: 'tablet'})),
   ...[1470, 1512, 1536, 1710, 1728].map(width => ({width, height: 1080, group: 'laptop'})),
   ...[[1920,1080], [2560,1440], [3440,1440], [3840,2160], [5120,2880], [6016,3384], [7680,4320]]
@@ -11,6 +11,7 @@ const viewports = [
 ];
 const cases = [...viewports.map(viewport => ({...viewport, text: 100, dpr: 1})),
   ...[639, 640, 767, 1023, 1279, 1535].map(width => ({width,height:1080,group:'breakpoint',text:100,dpr:1})),
+  ...[320, 375, 414].flatMap(width => [125, 150, 200].map(text => ({...viewports.find(viewport => viewport.width === width), text, dpr: 1}))),
   ...[360, 834, 1470, 3840].map(width => ({...viewports.find(viewport => viewport.width === width), text: 200, dpr: 1})),
   ...[393, 1512].flatMap(width => [1, 2].map(dpr => ({...viewports.find(viewport => viewport.width === width), text: 100, dpr}))),
 ];
@@ -60,6 +61,13 @@ const measure = () => {
     if(!visible(element))continue;const r=rect(element);
     if(r.width<47.5 || r.height<47.5)errors.push('target below 48×48 CSS px: '+label(element)+' '+r.width.toFixed(1)+'×'+r.height.toFixed(1));
   }
+  for(const element of document.querySelectorAll('a[href],button,input:not([type=hidden]),select,summary,[role=button]')){
+    if(element.id==='language' || !visible(element) || element.matches('.skip-link'))continue;
+    const r=rect(element);
+    if(r.width<43.5 || r.height<43.5)errors.push('interactive target below 44×44 CSS px: '+label(element)+' '+r.width.toFixed(1)+'×'+r.height.toFixed(1));
+  }
+  const zoomToggle=document.querySelector('[data-text-size-toggle]');
+  if(!zoomToggle || !visible(zoomToggle) || outside(rect(zoomToggle),{left:0,right:innerWidth}))errors.push('zoom control unreachable');
   const hero=document.querySelector('.hero'), copy=document.querySelector('.cover-copy'), image=document.querySelector('.cover-image'), heading=document.querySelector('.hero h1');
   const copyBounds=getComputedStyle(copy).display==='contents' ? rect(hero) : rect(copy);
   if(outside(rect(heading),copyBounds))errors.push('hero heading escapes copy column');
