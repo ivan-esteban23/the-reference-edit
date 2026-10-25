@@ -11,12 +11,35 @@
  const gridElement=document.querySelector<HTMLElement>('#editorial-grid'),statusElement=document.querySelector<HTMLElement>('#editorial-status'),retryElement=document.querySelector<HTMLElement>('#editorial-retry');
  if(!gridElement||!statusElement||!retryElement)throw Error('Editorial gallery markup is missing');
  const grid=gridElement,status=statusElement,retry=retryElement;
- // Pages preparation scopes this URL. JSON image paths stay canonical; resolve them against the catalog's app root explicitly.
  const catalogURL=new URL('/data/references.json',location.href),appRoot=new URL('../',catalogURL);
- let state:State='loading',cards:Card[]=[],requestId=0;
- const messages:Partial<Record<State,string>>={loading:'Loading editorial studies…',error:'Editorial studies are unavailable. Try again when connected.',empty:'No editorial studies are available yet.'};
+ let state:State='ready',cards:Card[]=[],requestId=0;
+ const messages:Partial<Record<State,string>>={error:'Editorial studies are unavailable. Try again when connected.',empty:'No editorial studies are available yet.'};
+ function bindInitialCards(){
+  const figures=[...grid.querySelectorAll<HTMLElement>('.editorial-card')];
+  if(!figures.length)return;
+  cards=figures.map(fig=>{
+   const image=fig.querySelector<HTMLImageElement>('img')!;
+   const missing=fig.querySelector<HTMLParagraphElement>('.editorial-image-error')!;
+   const showMissing=()=>{image.hidden=true;missing.hidden=false;};
+   image.addEventListener('error',showMissing);
+   if(image.complete&&image.naturalWidth===0)showMissing();
+   return {
+    entry:{
+     id:fig.dataset.referenceId||'',
+     city:fig.querySelector('h3')!.textContent||'',
+     context:fig.querySelector('.editorial-context')!.textContent||'',
+     caption:fig.querySelector('.editorial-caption')!.textContent||'',
+     disclosure:fig.querySelector('.editorial-disclosure')!.textContent||'',
+     image:new URL(image.getAttribute('src')||'',location.href).pathname,
+     imageType:'ai-generated',source:'Created with ChatGPT',width:Number(image.getAttribute('width'))||image.width,height:Number(image.getAttribute('height'))||image.height,assetStatus:'available'
+    },
+    image,city:fig.querySelector('h3')!,context:fig.querySelector('.editorial-context')!,caption:fig.querySelector('.editorial-caption')!,disclosure:fig.querySelector('.editorial-disclosure')!,missing
+   };
+  });
+ }
+ bindInitialCards();
  function localize(){
-  status.hidden=state==='ready';status.textContent=t(messages[state]||'');retry.hidden=state!=='error';retry.textContent=t('Try again');
+  const msg=messages[state];status.hidden=state==='ready'||!msg;status.textContent=msg?t(msg):'';retry.hidden=state!=='error';retry.textContent=t('Try again');
   for(const card of cards){const {entry,image,city,context,caption,disclosure,missing}=card;
    city.textContent=t(entry.city);context.textContent=t(entry.context);caption.textContent=t(entry.caption);disclosure.textContent=t(entry.disclosure);
    image.alt=t(entry.city)+'. '+t(entry.caption);missing.textContent=t('Image unavailable. The editorial caption is still available below.');
@@ -27,9 +50,9 @@
   entries.forEach((entry,index)=>{
    const figure=document.createElement('figure');figure.className='editorial-card';figure.dataset.referenceId=entry.id;
    const frame=document.createElement('div');frame.className='editorial-image';frame.style.setProperty('--editorial-ratio',entry.width+' / '+entry.height);
-   const image=document.createElement('img');image.width=entry.width;image.height=entry.height;image.decoding='async';
+   const image=document.createElement('img');image.width=entry.width;image.height=entry.height;image.loading='lazy';image.decoding='async';
    const missing=document.createElement('p');missing.className='editorial-image-error';missing.hidden=true;
-   image.addEventListener('error',()=>{image.hidden=true;missing.hidden=false;});
+   image.addEventListener('error',()=>{image.hidden=true;missing.hidden=false;});image.removeAttribute('loading');
    image.src=new URL(entry.image.slice(1),appRoot).href;frame.append(image,missing);
    const body=document.createElement('figcaption'),line=document.createElement('div');line.className='editorial-cityline';
    const city=document.createElement('h3'),number=document.createElement('span');number.className='editorial-number';number.textContent=String(index+1).padStart(2,'0');number.setAttribute('aria-hidden','true');line.append(city,number);
@@ -38,7 +61,7 @@
   });
  }
  async function load(){
-  const restoreFocus=document.activeElement===retry,id=++requestId;state='loading';localize();const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),6000);
+  const restoreFocus=document.activeElement===retry,id=++requestId;const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),6000);
   try{
    const response=await fetch(catalogURL,{signal:controller.signal});if(!response.ok)throw Error('Catalog unavailable');
    const data=await response.json() as {version?:unknown;references?:unknown};if(data.version!==1||!Array.isArray(data.references))throw Error('Invalid catalog');
