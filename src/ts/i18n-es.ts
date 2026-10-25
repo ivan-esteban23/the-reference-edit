@@ -299,7 +299,7 @@ const i18nEs = {
   "Partial": "Acceso parcial",
   "The Reference Edit — Visual Research and Moodboarding": "The Reference Edit — Investigación visual y moodboarding",
   "Pinterest.": "Pinterest.",
-  "Portrait reference from The Portrait Edit, Issue 01": "Referencia de retrato de The Portrait Edit, Número 01",
+  "Cover reference from The Portrait Edit, Study 02.": "Referencia de portada de The Portrait Edit, Estudio 02.",
   "Posts reflect participating users, not population-wide trends. Trace images to their creators.": "Las publicaciones reflejan a quienes participan, no tendencias de toda la población. Rastrea las imágenes hasta sus creadores.",
   "Prepare a photo shoot": "Prepara una sesión de fotos",
   "Print / Save PDF": "Imprimir / Guardar PDF",

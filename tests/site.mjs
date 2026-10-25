@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import vm from 'node:vm';
+import axe from 'axe-core';
 import {readFile} from 'node:fs/promises';
 import path from 'node:path';
 import {createHash} from 'node:crypto';
@@ -121,11 +122,28 @@ const key = async (key, code = key) => {
 };
 try {
   await navigate();
-  await ev('window.scrollTo(0,document.body.scrollHeight)');
-  await pause(250);
+  await ev(axe.source);
+  result.imageAccessibility = [];
+  for (const locale of ['en', 'es', 'zh-Hans', 'zh-Hant', 'ja', 'ko']) {
+    await select('#language', locale);
+    const images = await ev(`([...document.images].map(image => ({src: image.getAttribute('src'), alt: image.getAttribute('alt')})))`);
+    assert.ok(images.length >= 59, 'Expected the built home page images');
+    for (const image of images) {
+      assert.notEqual(image.alt, null, `${locale}: missing alt for ${image.src}`);
+      assert.ok(!/Issue 01/i.test(image.alt), `${locale}: stale issue name for ${image.src}`);
+    }
+    const hero = images.find(image => image.src === 'images/image-79c5c1401cc2d69b.jpg');
+    const naming = await ev(`document.querySelector('.cover-image figcaption span').textContent.split(' / ')`);
+    assert.equal(naming.length, 2, `${locale}: caption must identify publication and study`);
+    assert.ok(hero.alt.includes(naming[0]) && hero.alt.includes(naming[1]), `${locale}: hero alt and caption disagree`);
+    assert.ok(hero.alt.length < 125, `${locale}: hero alt exceeds the length limit`);
+    const audit = await ev(`axe.run(document, {runOnly: {type: 'rule', values: ['image-alt', 'area-alt', 'input-image-alt', 'role-img-alt', 'svg-img-alt']}}).then(({violations, passes}) => ({violations, passedRules: passes.map(rule => rule.id)}))`);
+    assert.deepEqual(audit.violations, [], `${locale}: axe image alternative violations`);
+    result.imageAccessibility.push({locale, images: images.length, heroAlt: hero.alt, ...audit});
+  }
+  await select('#language', 'en');
+  check('Home page image alternatives: six languages, alt attributes present, matching hero captions, zero axe alt-text violations');
   assert.ok(await ev("Promise.all([...document.querySelectorAll('img:not(#editorial-gallery img)')].map(i=>i.decode())).then(()=>[...document.querySelectorAll('img:not(#editorial-gallery img)')].every(i=>i.naturalWidth>0))"), 'Extracted images did not render');
-  await ev('window.scrollTo(0,0)');
-  await pause(50);
   check('All 59 cover/source images retain their bytes and all page images decode');
   result.editorialImages=[];
   for(const entry of availableReferences){

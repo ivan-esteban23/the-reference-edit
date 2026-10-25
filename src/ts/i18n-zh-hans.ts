@@ -238,7 +238,7 @@ const i18nZhHans: Record<TKey, string> = {
   "Partial": "部分开放",
   "The Reference Edit — Visual Research and Moodboarding": "The Reference Edit — 视觉研究和情绪板",
   "Pinterest.": "Pinterest。",
-  "Portrait reference from The Portrait Edit, Issue 01": "肖像参考来自 The Portrait Edit，第 01 期",
+  "Cover reference from The Portrait Edit, Study 02.": "The Portrait Edit / 习作 02 的封面参考。",
   "Posts reflect participating users, not population-wide trends. Trace images to their creators.": "帖子反映的是参与用户，而不是总体趋势。追踪图像的创作者。",
   "Prepare a photo shoot": "准备拍照",
   "Print / Save PDF": "打印/保存 PDF",

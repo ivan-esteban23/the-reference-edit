@@ -238,7 +238,7 @@ const i18nKo: Record<TKey, string> = {
   "Partial": "일부 공개",
   "The Reference Edit — Visual Research and Moodboarding": "The Reference Edit — 시각적 연구 및 무드보딩",
   "Pinterest.": "Pinterest.",
-  "Portrait reference from The Portrait Edit, Issue 01": "The Portrait Edit, Issue 01의 인물 사진 참조",
+  "Cover reference from The Portrait Edit, Study 02.": "The Portrait Edit, 스터디 02의 표지 참조.",
   "Posts reflect participating users, not population-wide trends. Trace images to their creators.": "게시물은 인구 전체의 추세가 아닌 참여 사용자를 반영합니다. 이미지를 만든 사람까지 추적합니다.",
   "Prepare a photo shoot": "사진 촬영 준비",
   "Print / Save PDF": "PDF 인쇄/저장",

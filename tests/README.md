@@ -128,3 +128,5 @@ OLD_REVISION=0b65563462dbcba0aa6e93eb59f5491d15e3fdf5 RESULTS_DIR=/tmp/editorial
 ```
 
 The worker suite derives the prior shell size from that actual worker and verifies that a failed new gallery-image download leaves the old installation usable, then a successful upgrade provides all three illustrations offline without changing stored preferences or causing reload loops.
+
+The site suite runs axe-core image-alternative rules on the built home page in all six languages. It checks that every image has an alt attribute, no alt retains “Issue 01”, and the hero alt includes the caption’s publication and translated study name in fewer than 125 characters. Existing decorative initials retain empty alt attributes; axe validates their use.

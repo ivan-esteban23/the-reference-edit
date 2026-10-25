@@ -276,7 +276,7 @@ const i18nZhHant: Record<TKey, string> = {
   "Partial": "部分開放",
   "The Reference Edit — Visual Research and Moodboarding": "The Reference Edit — 視覺研究與情緒板",
   "Pinterest.": "Pinterest。",
-  "Portrait reference from The Portrait Edit, Issue 01": "肖像參考來自 The Portrait Edit，第 01 期",
+  "Cover reference from The Portrait Edit, Study 02.": "The Portrait Edit / 習作 02 的封面參考。",
   "Posts reflect participating users, not population-wide trends. Trace images to their creators.": "貼文反映的是參與用戶，而不是整體趨勢。追蹤影像的創作者。",
   "Prepare a photo shoot": "準備拍照",
   "Print / Save PDF": "列印/儲存 PDF",

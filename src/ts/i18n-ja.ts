@@ -296,7 +296,7 @@ const i18nJa: Record<TKey, string> = {
   "Partial": "一部公開",
   "The Reference Edit — Visual Research and Moodboarding": "The Reference Edit — ビジュアルリサーチとムードボード",
   "Pinterest.": "Pinterest。",
-  "Portrait reference from The Portrait Edit, Issue 01": "The Portrait Edit、第 01 号のポートレート参照",
+  "Cover reference from The Portrait Edit, Study 02.": "The Portrait Edit、スタディ 02 の表紙参考。",
   "Posts reflect participating users, not population-wide trends. Trace images to their creators.": "投稿は参加ユーザーを反映するものであり、集団全体の傾向を反映するものではありません。画像を作成者まで追跡します。",
   "Prepare a photo shoot": "写真撮影の準備をする",
   "Print / Save PDF": "PDFの印刷/保存",
