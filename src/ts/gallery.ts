@@ -51,5 +51,5 @@
   }catch(error){if(id!==requestId)return;render([]);state='error';}
   finally{clearTimeout(timer);if(id===requestId){localize();if(restoreFocus){const target=state==='error'?retry:document.querySelector<HTMLElement>('#editorial-title');if(target&&target!==retry)target.setAttribute('tabindex','-1');target?.focus({preventScroll:true});}}}
  }
- retry.addEventListener('click',load);window.addEventListener('visual-edit:languagechange',localize);load();
+ retry.addEventListener('click',load);window.addEventListener('visual-edit:languagechange',localize);requestAnimationFrame(()=>setTimeout(load,0));
 })();

@@ -2,7 +2,7 @@
 (()=>{let saved=null;try{saved=localStorage.getItem('visual-edit-theme');}catch(e){}
 const theme=saved==='light'||saved==='dark'?saved:(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');
 document.documentElement.dataset.theme=theme;
-try{if(localStorage.getItem('visual-edit-text-size')==='large')document.documentElement.dataset.textSize='large';}catch(e){}
+try{const z=localStorage.getItem('visual-edit-text-size');if(z==='large'||z==='xlarge')document.documentElement.dataset.textSize=z;}catch(e){}
 document.querySelector('meta[name="theme-color"]').content=theme==='dark'?'#151513':'#f3f0e9';})();
 </script><title>The Reference Edit — Visual Research and Moodboarding</title><style data-src="styles/app.css"></style><meta name="apple-mobile-web-app-title" content="The Reference Edit"></head><body><!-- Bundled Newsreader and Inter font licenses:
 Newsreader
