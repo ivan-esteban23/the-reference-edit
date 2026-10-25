@@ -139,7 +139,7 @@ try {
   await pause(50);
   result.mobileEntry=await ev("({searchTop:document.querySelector('.search-bar').getBoundingClientRect().top,firstCardTop:document.querySelector('.source').getBoundingClientRect().top,toolsClosed:!document.querySelector('#collection-tools').open,collectionHidden:document.querySelector('#my-sources').hidden})");
   assert.ok(result.mobileEntry.searchTop<1000&&result.mobileEntry.firstCardTop<1550,'Mobile entry became too long: '+JSON.stringify(result.mobileEntry));
-  assert.ok(result.mobileEntry.toolsClosed&&result.mobileEntry.collectionHidden);
+  assert.ok(result.mobileEntry.toolsClosed&&result.mobileEntry.collectionHidden&&await ev("getComputedStyle(document.querySelector('.section-navigation')).display==='none'&&document.querySelector('#sections-menu nav a[aria-current=location]')?.getAttribute('href')==='#directory'"));
   await ev("document.querySelector('#collection-tools').open=true");
   assert.ok(await ev("['#export-favorites','#share-view'].every(s=>document.querySelector(s).getClientRects().length>0)"),'Collection tools inaccessible when expanded');
   await ev("document.querySelector('#collection-tools').open=false");

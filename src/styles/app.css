@@ -226,7 +226,7 @@ summary::-webkit-details-marker{display:none}
 .app-entry{min-height:var(--control-height);padding:0;text-align:left;border:0;background:transparent;font-size:var(--text-small)}
 .app-heading{display:flex;align-items:start;justify-content:space-between;gap:18px}.app-heading h2{margin-top:0}.app-actions{display:flex;flex-wrap:wrap;gap:12px;margin:18px 0}.app-status{border-top:1px solid var(--line);padding-top:16px;color:var(--muted);font-size:var(--text-small)}
 #directory,#notes{border-bottom:1px solid var(--line)}
-.jump a[href='#directory']{font-weight:600;color:var(--ink)}
+:where(.jump,#sections-menu nav) a[aria-current="location"]{font-weight:600;color:var(--accent)}
 .source-metadata{border-top:1px solid var(--line);padding-top:var(--space-3)}
 .card-meta>span:first-child{font-size:var(--text-label);font-variant-numeric:tabular-nums}
 .brand-initials{padding:0;border:0;background:var(--soft)}
@@ -723,7 +723,7 @@ html[data-text-size="large"]{font-size:112.5%}
   .footer-main{grid-template-columns:minmax(0,1.3fr) minmax(0,1fr)}
  }
  @media(max-width:639px){
-  #open-collection{display:none}
+  #open-collection,.section-navigation{display:none}
   .masthead{padding-block:4px 6px;gap:6px}
   .cross-nav{padding-block:2px}
   .cross-nav .cross-nav-current{display:none}
