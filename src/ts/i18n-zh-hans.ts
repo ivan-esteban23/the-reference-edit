@@ -474,7 +474,6 @@ const i18nZhHans: Record<TKey, string> = {
   "Style, imagined.": "想象中的风格。",
   "Three city-inspired studies in silhouette and everyday dressing.": "三组城市灵感造型，探索轮廓与日常穿搭。",
   "AI-generated illustrations, separate from our research sources. Not documentary photography.": "AI 生成的插画，与研究来源分开展示。并非纪实摄影。",
-  "Loading editorial studies…": "正在加载编辑造型…",
   "Try again": "重试",
   "Editorial studies are unavailable. Try again when connected.": "暂时无法加载编辑造型。请联网后重试。",
   "No editorial studies are available yet.": "暂时没有可展示的编辑造型。",

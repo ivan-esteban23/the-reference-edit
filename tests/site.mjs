@@ -121,7 +121,11 @@ const key = async (key, code = key) => {
 };
 try {
   await navigate();
-  assert.ok(await ev("Promise.all([...document.images].map(i=>i.decode())).then(()=>[...document.images].every(i=>i.naturalWidth>0))"), 'Extracted images did not render');
+  await ev('window.scrollTo(0,document.body.scrollHeight)');
+  await pause(250);
+  assert.ok(await ev("Promise.all([...document.querySelectorAll('img:not(#editorial-gallery img)')].map(i=>i.decode())).then(()=>[...document.querySelectorAll('img:not(#editorial-gallery img)')].every(i=>i.naturalWidth>0))"), 'Extracted images did not render');
+  await ev('window.scrollTo(0,0)');
+  await pause(50);
   check('All 59 cover/source images retain their bytes and all page images decode');
   result.editorialImages=[];
   for(const entry of availableReferences){
@@ -345,6 +349,9 @@ try {
   assert.ok(readingCheck.reset.every(fs => fs === 16), JSON.stringify(readingCheck.reset));
   assert.deepEqual(readingCheck.fontSwap, [{family: 'Newsreader', display: 'swap', weight: '350 600'}, {family: 'Inter', display: 'swap', weight: '400 600'}]);
   check('Reading column uses 16px minimum, 1.65 line-height, 65ch measure, 16/18/20px text-size control, and font-display:swap');
+  assert.ok(!html.includes('Loading editorial studies'), 'Built HTML contains loading text outside noscript');
+  assert.equal([...html.matchAll(/class="editorial-card"/g)].length, 3, 'Built HTML does not contain static editorial cards');
+  check('Editorial gallery is statically rendered in built HTML without loading text');
   assert.deepEqual(page.exceptions, []); result.passed = true;
 } catch (error) {result.passed = false; result.error = error.stack; process.exitCode = 1;}
 finally {await page.close(); await report('site', result);}

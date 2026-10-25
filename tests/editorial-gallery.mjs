@@ -9,7 +9,7 @@ const {evaluate:ev,call,navigate,until}=page,result={checks:[],layouts:[],passed
 const check=name=>{result.checks.push(name);console.log(name);};
 let pageClosed=false;
 const ready=()=>until("document.querySelectorAll('.editorial-card img').length===3&&document.querySelector('#editorial-status').hidden");
-const decode=()=>ev("Promise.all([...document.querySelectorAll('.editorial-card img')].map(image=>image.decode())).then(()=>true)");
+const decode=async()=>{await ev("window.scrollTo(0,document.body.scrollHeight)");await until("[...document.querySelectorAll('.editorial-card img')].every(image=>image.complete&&image.naturalWidth>0)");return ev("Promise.all([...document.querySelectorAll('.editorial-card img')].map(image=>image.decode())).then(()=>true)");};
 function contrast(fg,bg){
  const luminance=color=>{const rgb=color.match(/[\d.]+/g).slice(0,3).map(Number).map(v=>{v/=255;return v<=.04045?v/12.92:((v+.055)/1.055)**2.4;});return rgb[0]*.2126+rgb[1]*.7152+rgb[2]*.0722;};
  const a=luminance(fg),b=luminance(bg);return (Math.max(a,b)+.05)/(Math.min(a,b)+.05);
@@ -27,6 +27,18 @@ try{
  assert.equal(await ev("document.querySelectorAll('#editorial-gallery h2').length"),1);
  assert.equal(await ev("document.querySelectorAll('#editorial-gallery h3').length"),3);
  check('Catalog-driven cards preserve city, context, caption, disclosure, full-resolution geometry and descriptive alt text; empty source URLs create no links');
+
+ await call('Emulation.setScriptExecutionDisabled',{value:true});
+ await navigate();
+ const noJsCards=await ev("[...document.querySelectorAll('.editorial-card')].map(card=>({id:card.dataset.referenceId,city:card.querySelector('h3').textContent,alt:card.querySelector('img').alt,disclosure:card.querySelector('.editorial-disclosure').textContent,loading:card.querySelector('img').getAttribute('loading'),width:card.querySelector('img').getAttribute('width'),height:card.querySelector('img').getAttribute('height')}))");
+ assert.equal(noJsCards.length,3);
+ assert.ok(noJsCards.every(c=>c.city&&c.alt&&c.disclosure&&c.disclosure.includes('AI-generated')&&c.disclosure.includes('illustration')&&c.loading==='lazy'&&c.width==='1024'&&c.height==='1280'));
+ assert.equal(await ev("document.querySelector('#editorial-status').textContent.trim()"),'');
+ assert.ok(await ev("document.querySelector('#editorial-status').hidden"));
+ check('With JavaScript disabled, all three studies, width/height, lazy loading, descriptive alt and AI labels are visible without loading text');
+ await call('Emulation.setScriptExecutionDisabled',{value:false});
+ await navigate();
+ await ready();
 
  await call('Emulation.setDeviceMetricsOverride',{width:390,height:844,deviceScaleFactor:1,mobile:false});
  await ev("document.querySelector('.hero-actions a[href=\"#editorial-gallery\"]').focus()");
@@ -136,7 +148,7 @@ try{
   mode='unsafe-text';await failure.navigate('/?scenario=unsafe-text');await failure.until("document.querySelectorAll('.editorial-card').length===3");
   assert.equal(await failure.evaluate("document.querySelector('.editorial-caption').textContent"),'<img src=x onerror="window.galleryInjected=true">');
   assert.equal(await failure.evaluate("!!window.galleryInjected||!!document.querySelector('.editorial-caption img')"),false);
-  mode='missing-image';await failure.navigate('/?scenario=missing-image');await failure.until("document.querySelector('.editorial-image-error')&&!document.querySelector('.editorial-image-error').hidden");
+  mode='missing-image';await failure.navigate('/?scenario=missing-image');await failure.evaluate("document.querySelector('#editorial-gallery').scrollIntoView()");await failure.until("document.querySelector('.editorial-image-error')&&!document.querySelector('.editorial-image-error').hidden");
   assert.ok(await failure.evaluate("document.querySelector('.editorial-card img').hidden&&!!document.querySelector('.editorial-card .editorial-caption').textContent&&!!document.querySelector('.editorial-card .editorial-disclosure').textContent"));
   assert.deepEqual(failure.exceptions,[]);
   check('Catalog failures/timeouts, invalid paths/disclosures/IDs, retry, empty/pending entries, inert metadata and image-404 placeholders are handled without page exceptions');

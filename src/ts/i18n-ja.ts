@@ -474,7 +474,6 @@ const i18nJa: Record<TKey, string> = {
   "Style, imagined.": "想像から生まれるスタイル。",
   "Three city-inspired studies in silhouette and everyday dressing.": "3つの都市を着想源に、シルエットと日常の装いを探る。",
   "AI-generated illustrations, separate from our research sources. Not documentary photography.": "研究用の情報源とは別に掲載するAI生成イラストです。記録写真ではありません。",
-  "Loading editorial studies…": "エディトリアルスタディを読み込み中…",
   "Try again": "再試行",
   "Editorial studies are unavailable. Try again when connected.": "スタディを読み込めません。接続後にもう一度お試しください。",
   "No editorial studies are available yet.": "公開できるスタディはまだありません。",

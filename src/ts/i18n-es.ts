@@ -475,7 +475,6 @@ const i18nEs = {
   "Style, imagined.": "Estilo imaginado.",
   "Three city-inspired studies in silhouette and everyday dressing.": "Tres estudios inspirados en ciudades sobre siluetas y vestimenta cotidiana.",
   "AI-generated illustrations, separate from our research sources. Not documentary photography.": "Ilustraciones generadas con IA, separadas de nuestras fuentes de investigación. No son fotografías documentales.",
-  "Loading editorial studies…": "Cargando estudios editoriales…",
   "Try again": "Reintentar",
   "Editorial studies are unavailable. Try again when connected.": "Los estudios editoriales no están disponibles. Vuelve a intentarlo cuando tengas conexión.",
   "No editorial studies are available yet.": "Todavía no hay estudios editoriales disponibles.",

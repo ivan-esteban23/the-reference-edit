@@ -474,7 +474,6 @@ const i18nKo: Record<TKey, string> = {
   "Style, imagined.": "상상으로 그린 스타일.",
   "Three city-inspired studies in silhouette and everyday dressing.": "세 도시에서 영감을 받아 실루엣과 일상의 옷차림을 탐구합니다.",
   "AI-generated illustrations, separate from our research sources. Not documentary photography.": "리서치 소스와 구분해 전시하는 AI 생성 일러스트입니다. 기록 사진이 아닙니다.",
-  "Loading editorial studies…": "에디토리얼 스터디를 불러오는 중…",
   "Try again": "다시 시도",
   "Editorial studies are unavailable. Try again when connected.": "스터디를 불러올 수 없습니다. 연결 후 다시 시도해 주세요.",
   "No editorial studies are available yet.": "아직 표시할 수 있는 스터디가 없습니다.",
