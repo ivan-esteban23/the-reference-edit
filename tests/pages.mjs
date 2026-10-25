@@ -14,9 +14,16 @@ try{
  await walk();assert.ok(files.has('/.nojekyll'));
  for(const [name,bytes] of await assets())assert.deepEqual(bytes,original.get(name),'Source file changed during Pages preparation');
  for(const [name,bytes] of original)if(!['/index.html','/manifest.webmanifest','/sw.js'].includes(name))assert.deepEqual(files.get(name),bytes);
- const records=html=>html.toString().match(/<article\b[^>]*class="source"[\s\S]*?<\/article>/g);
- assert.equal(records(files.get('/index.html')).length,58);assert.deepEqual(records(files.get('/index.html')),records(original.get('/index.html')));
+ const records=html=>html.toString().match(/<article\b[^>]*class="source"[\s\S]*?<\/article>/g),preparedHtml=files.get('/index.html').toString();
+ assert.equal(records(preparedHtml).length,58);assert.deepEqual(records(preparedHtml),records(original.get('/index.html')));
+ assert.ok(preparedHtml.includes('content:"\\00B7"/""'),'Pages preparation must not scope CSS content strings');
+ assert.ok(!/content:"[^"]*\/the-reference-edit\//.test(preparedHtml),'Pages preparation corrupted a CSS content string');
+ assert.match(preparedHtml,/<link rel="manifest" href="\/the-reference-edit\/manifest\.webmanifest">/,'Static manifest link is missing or unscoped');
+ for(const file of ['/robots.txt','/sitemap.xml'])assert.ok(files.has(file),`${file} is missing from the prepared site`);
+ assert.match(files.get('/robots.txt').toString(),/Sitemap: https:\/\/ivan-esteban23\.github\.io\/the-reference-edit\/sitemap\.xml/);
+ assert.match(files.get('/sitemap.xml').toString(),/<loc>https:\/\/ivan-esteban23\.github\.io\/the-reference-edit\/<\/loc>/);
  check('Pages preparation preserves the source checkout, all 58 records and binary assets');
+ check('Pages preparation preserves CSS strings and ships static discovery files');
  page=await browser((req,res)=>{
   if(offline){req.socket.destroy();return;}
   if(!req.url.startsWith(base)){res.writeHead(404);res.end();return;}
@@ -25,6 +32,8 @@ try{
  files.set('/seed.html',Buffer.from('<!doctype html><title>Cache migration fixture</title>'));
  // Omarchy scans only the first 100 KB of raw HTML; it does not execute scripts.
  const raw=await (await fetch(page.origin+base)).text();
+ assert.match(raw,/<link rel="manifest" href="\/the-reference-edit\/manifest\.webmanifest">/,'Manifest link must be present in raw HTML');
+ for(const file of ['robots.txt','sitemap.xml'])assert.equal(await fetch(page.origin+base+file).then(response=>response.status),200,`${file} is not served`);
  const discovered=execFileSync('bash',['-c',String.raw`tr '\n' ' ' | grep -oiE "<link[^>]*rel=[\"'][^\"']*apple-touch-icon[^\"']*[\"'][^>]*>" | grep -oiE "href=[\"'][^\"']+" | head -1 | sed -E "s/^href=[\"']//"`],{input:Buffer.from(raw).subarray(0,100000),encoding:'utf8'}).trim();
  assert.ok(discovered,'Omarchy cannot discover a static Apple touch icon in the first 100 KB');
  // Match Omarchy's root-relative URL handling; avoid a false pass from browser URL resolution.

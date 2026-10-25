@@ -27,7 +27,6 @@
     "src/ts/i18n-ja.ts",
     "src/ts/i18n-ko.ts",
     "src/ts/i18n.ts",
-    "src/ts/manifest-inject.ts",
     "src/ts/theme-language.ts",
     "src/ts/gallery.ts"
   ]

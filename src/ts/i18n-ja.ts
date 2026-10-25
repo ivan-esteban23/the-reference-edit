@@ -490,6 +490,7 @@ const i18nJa: Record<TKey, string> = {
   "Camel trench coat, Breton stripe, dark denim, and leather loafers.": "キャメルのトレンチコート、ボーダートップス、ダークデニム、レザーのローファー。",
   "AI-generated editorial illustration · Created with ChatGPT · Not documentary photography": "AI生成のエディトリアルイラスト · ChatGPTで制作 · 記録写真ではありません",
   "Dark": "ダーク",
+  "Large text": "文字を大きく",
   "Fonts: Newsreader and Inter. Cover: The Portrait Edit / Study 02. Fonts and cover are saved with the offline directory; source logos are cached on later online visits. External websites need internet.": "フォント：Newsreader と Inter。表紙：The Portrait Edit / Study 02。フォントと表紙はオフラインのディレクトリとともに保存されます。情報源のロゴは次回以降のオンライン閲覧時に保存されます。外部サイトにはインターネット接続が必要です。",
   "Collection tools": "コレクションツール",
   "My collection": "マイコレクション",

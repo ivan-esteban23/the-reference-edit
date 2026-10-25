@@ -491,6 +491,7 @@ const i18nEs = {
   "Camel trench coat, Breton stripe, dark denim, and leather loafers.": "Gabardina camel, camiseta de rayas marineras, vaqueros oscuros y mocasines de cuero.",
   "AI-generated editorial illustration · Created with ChatGPT · Not documentary photography": "Ilustración editorial generada con IA · Creada con ChatGPT · No es fotografía documental",
   "Dark": "Oscuro",
+  "Large text": "Texto grande",
   "Fonts: Newsreader and Inter. Cover: The Portrait Edit / Study 02. Fonts and cover are saved with the offline directory; source logos are cached on later online visits. External websites need internet.": "Tipografía: Newsreader e Inter. Portada: The Portrait Edit / Estudio 02. Las fuentes tipográficas y la portada se guardan con el directorio sin conexión; los logotipos se guardan en visitas posteriores con conexión. Los sitios externos necesitan internet.",
   "Collection tools": "Herramientas de colección",
   "My collection": "Mi colección",

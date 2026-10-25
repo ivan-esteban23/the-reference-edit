@@ -265,14 +265,16 @@ try {
   assert.ok(await ev("activeFilterCount()===0&&document.querySelector('#reset').disabled&&document.querySelector('.filter-toggle-count').hidden&&cards.every(c=>!c.hidden)&&favoriteKeys.size===1"));
   check('Search + four combined filters + favorites, counts/chips, chip removal and Reset');
   await select('#language', 'es');
-  await ev("if(document.documentElement.dataset.theme==='dark')document.querySelector('[data-theme-toggle]').click();document.querySelector('[data-theme-toggle]').click()");
+  await ev("if(document.documentElement.dataset.theme==='dark')document.querySelector('[data-theme-toggle]').click();document.querySelector('[data-theme-toggle]').click();if(document.documentElement.dataset.textSize==='large')document.querySelector('[data-text-size-toggle]').click();document.querySelector('[data-text-size-toggle]').click()");
+  assert.ok(await ev("document.documentElement.dataset.textSize==='large'&&document.querySelector('[data-text-size-toggle]').getAttribute('aria-pressed')==='true'&&localStorage.getItem('visual-edit-text-size')==='large'"));
   await select('#country-filter', 'Japan');
   const stored = await ev('({...localStorage})');
   await navigate('', true);
   assert.deepEqual(await ev('({...localStorage})'), stored);
   assert.ok(await ev("document.documentElement.lang==='es'&&document.documentElement.dataset.theme==='dark'&&favoriteKeys.size===1&&document.querySelector('#country-filter').value==='Japan'"));
   await navigate('/');
-  assert.ok(await ev("document.documentElement.lang==='es'&&document.documentElement.dataset.theme==='dark'&&favoriteKeys.size===1"));
+  assert.ok(await ev("document.documentElement.lang==='es'&&document.documentElement.dataset.theme==='dark'&&document.documentElement.dataset.textSize==='large'&&favoriteKeys.size===1"));
+  await ev("document.querySelector('[data-text-size-toggle]').click()");
   check('Favorites/theme/language persistence on reload and reopen; shared filter restoration');
   await select('#language', 'en');
   await navigate('/?guide-check=1#workflow');

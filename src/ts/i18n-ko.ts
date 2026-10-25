@@ -490,6 +490,7 @@ const i18nKo: Record<TKey, string> = {
   "Camel trench coat, Breton stripe, dark denim, and leather loafers.": "캐멀 트렌치코트, 스트라이프 톱, 짙은 데님과 가죽 로퍼.",
   "AI-generated editorial illustration · Created with ChatGPT · Not documentary photography": "AI 생성 에디토리얼 일러스트 · ChatGPT로 제작 · 기록 사진이 아닙니다",
   "Dark": "다크",
+  "Large text": "큰 글자",
   "Fonts: Newsreader and Inter. Cover: The Portrait Edit / Study 02. Fonts and cover are saved with the offline directory; source logos are cached on later online visits. External websites need internet.": "글꼴: Newsreader 및 Inter. 표지: The Portrait Edit / Study 02. 글꼴과 표지는 오프라인 디렉터리와 함께 저장됩니다. 소스 로고는 이후 온라인 방문 시 캐시됩니다. 외부 웹사이트에는 인터넷이 필요합니다.",
   "Collection tools": "컬렉션 도구",
   "My collection": "내 컬렉션",
