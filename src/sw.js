@@ -1,5 +1,5 @@
 // Version the offline shell whenever index.html or its app assets change.
-const CACHE='visual-edit-shell-editorial-principles-v13';
+const CACHE='visual-edit-shell-editorial-principles-v14';
 // Precache the cover, gallery catalog and three illustrations. Source logos cache on demand.
 const SHELL=['/data/references.json','/images/references/tokyo-street/tokyo-street-01.jpg','/images/references/seoul-fashion-week/seoul-fashion-week-01.jpg','/images/references/paris-office/paris-office-01.jpg','/index.html','/manifest.webmanifest','/favicon.svg','/icons/reference-edit-192.png','/icons/reference-edit-512.png','/icons/reference-edit-maskable-512.png','/icons/reference-edit-apple-touch-180.png','/icons/reference-edit-favicon-64.png','/images/image-79c5c1401cc2d69b.jpg','/fonts/font-8a08d13f8a6c0d51.ttf','/fonts/font-29160a80ff49ddca.ttf'];
 // Hosting may redirect /index.html to /. Store a fresh response so navigation can reuse it safely.
