@@ -77,7 +77,7 @@ export function buildJsonLd(sourceList) {
 }
 
 const jsonLd = buildJsonLd(sources);
-const jsonLdTag = `<script type="application/ld+json">\n${JSON.stringify(jsonLd, null, 2)}\n</script>`;
+const jsonLdTag = `<script type="application/ld+json">\n${JSON.stringify(jsonLd)}\n</script>`;
 
 let updatedHtml = html;
 if (updatedHtml.includes('<script type="application/ld+json">')) {

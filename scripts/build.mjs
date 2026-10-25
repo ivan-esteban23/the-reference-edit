@@ -84,7 +84,12 @@ const styles = await inline(html, INLINED_STYLE, async file => {
   return `<style>${css}</style>`;
 });
 const scripts = await inline(styles.markup, INLINED_SCRIPT, async file => {
-  const js = await load(file);
+  const rawJs = await load(file);
+  const js = rawJs
+    .split('\n')
+    .map(line => line.trim())
+    .filter(line => line && !line.startsWith('//'))
+    .join('\n');
   assertEmbeddable(js, file);
   return `<script>${js}</script>`;
 });
