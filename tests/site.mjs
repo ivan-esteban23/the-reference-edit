@@ -289,8 +289,9 @@ try {
   assert.ok(await ev("location.hash==='#routes'&&search.value===''&&!collectionOpen"),'Back navigation lost the guide to stale directory filters');
   check('Three concise guides, legacy fragments, browser Back and native keyboard disclosure controls');
   await ev("document.querySelectorAll('.source-details').forEach(d=>d.open=false);document.querySelector('.source-details summary').focus()");
-  await key('Enter'); assert.equal(await ev("document.querySelector('.source-details').open"), true);
-  await key(' ' ,'Space'); assert.equal(await ev("document.querySelector('.source-details').open"), false);
+  assert.equal(await ev("document.querySelector('.source-details summary').getAttribute('aria-expanded')"), "false");
+  await key('Enter'); assert.equal(await ev("document.querySelector('.source-details').open&&document.querySelector('.source-details summary').getAttribute('aria-expanded')==='true'"), true);
+  await key(' ' ,'Space'); assert.equal(await ev("!document.querySelector('.source-details').open&&document.querySelector('.source-details summary').getAttribute('aria-expanded')==='false'"), true);
   const disclosureStates = await ev("[...document.querySelectorAll('.source-details,.research-route,.guide-record')].map(d=>d.open)");
   await ev("window.dispatchEvent(new Event('beforeprint'))");
   assert.ok(await ev("[...document.querySelectorAll('.source-details,.research-route,.guide-record')].every(d=>d.open)"));
