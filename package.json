@@ -7,6 +7,7 @@
   "scripts": {
     "build": "node scripts/build.mjs",
     "typecheck": "tsc --noEmit && tsc --noEmit -p tsconfig.legacy.json",
+    "check": "npm run typecheck && npm run build",
     "test": "npm run typecheck && node scripts/build.mjs && node tests/workflows.mjs && node tests/site.mjs && node tests/responsive.mjs && node tests/editorial-gallery.mjs && node tests/chooser.mjs && node tests/collection.mjs && node tests/recently-viewed.mjs && node tests/personal-sources.mjs && node tests/personal-backup.mjs && node tests/collection-backup.mjs && node tests/collection-folders.mjs && node tests/source-notes.mjs && node tests/storage-compat.mjs && node tests/service-worker.mjs && node --test tests/worker-storage.mjs && node tests/pages.mjs && node tests/a11y.mjs && node tests/search-discovery.mjs"
   },
   "devDependencies": {
